@@ -5,14 +5,14 @@ Currently, this is being achieved by various google spreadsheets which aim at ga
 
 ## Features
 
-[ ] osu bancho login
-[ ] create tournament
-[ ] create mappool
-[ ] permissions (groups)
-[ ] invites
-[ ] suggestions to mappool
-[ ] feedback for maps
-[ ] voting for maps
-[ ] add map to mappool
-[ ] replay upload
-[ ] replay picking
+- [ ] osu bancho login
+- [ ] create tournament
+- [ ] create mappool
+- [ ] permissions (groups)
+- [ ] invites
+- [ ] suggestions to mappool
+- [ ] feedback for maps
+- [ ] voting for maps
+- [ ] add map to mappool
+- [ ] replay upload
+- [ ] replay picking
