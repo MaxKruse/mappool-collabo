@@ -1,6 +1,10 @@
 package util
 
-import "github.com/maxkruse/flagorenv"
+import (
+	"os"
+
+	_ "github.com/joho/godotenv/autoload"
+)
 
 type config struct {
 	// Database
@@ -14,19 +18,12 @@ type config struct {
 var Config config
 
 func init() {
-	c, err := flagorenv.LoadFlagsOrEnv[config](&flagorenv.Config{
-		Prefix:     "COLLAB",
-		PreferFlag: true,
-	})
-
-	if err != nil {
-		panic(err)
-	}
+	Config.BanchoOauthClientID = os.Getenv("BANCHO_OAUTH_CLIENT_ID")
+	Config.BanchoOauthClientSecret = os.Getenv("BANCHO_OAUTH_CLIENT_SECRET")
+	Config.BanchoOauthRedirectURL = os.Getenv("BANCHO_OAUTH_REDIRECT_URL")
 
 	// check if the oauth values are set
-	if c.BanchoOauthClientID == "" || c.BanchoOauthClientSecret == "" || c.BanchoOauthRedirectURL == "" {
+	if Config.BanchoOauthClientID == "" || Config.BanchoOauthClientSecret == "" || Config.BanchoOauthRedirectURL == "" {
 		panic("bancho oauth values are not set")
 	}
-
-	Config = c
 }
