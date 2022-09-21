@@ -105,13 +105,11 @@ func saveUser(user models.BanchoUserResponse, sessionToken string) error {
 		db.Create(&newUser)
 	}
 
-	// attempt to find the session we just saved by auth token
-	var savedSession entities.Session
-	db.Where("auth_token = ?", sessionToken).First(&savedSession)
-
 	// find the user for the session we just saved
-	var savedUser entities.User
-	db.First(&savedUser, savedSession.UserId)
+	savedUser, err := services.GetUserFromToken(sessionToken)
+	if err != nil {
+		return err
+	}
 
 	if savedUser.ID == 0 {
 		return errors.New("could not save user correctly to database")
@@ -139,7 +137,7 @@ func getOauth(ctx *fiber.Ctx, oauthConfig *oauth2.Config, code string) (*oauth2.
 	oauth_state := sess.Get("oauth_state")
 
 	if ctx.Query("state") != oauth_state {
-		return nil, fiber.ErrBadRequest
+		return nil, errors.New("invalid oauth state")
 	}
 
 	token, err := oauthConfig.Exchange(context.Background(), code)

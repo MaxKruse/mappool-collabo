@@ -30,6 +30,7 @@ func main() {
 	usersGroup := app.Group("/user")
 	{
 		usersGroup.Get("/", users.List)
+		usersGroup.Get("/self", users.GetSelf)
 		usersGroup.Get("/:id", users.Get)
 	}
 
