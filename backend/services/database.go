@@ -20,13 +20,15 @@ func init() {
 	}
 
 	// migrate tables
+	db.AutoMigrate(&entities.Session{})
 	db.AutoMigrate(&entities.User{})
+
 }
 
-func GetSession() *gorm.DB {
+func GetDBSession() *gorm.DB {
 	return db.Session(&gorm.Session{})
 }
 
-func GetDebugSession() *gorm.DB {
+func GetDebugDBSession() *gorm.DB {
 	return db.Debug().Session(&gorm.Session{})
 }

@@ -6,9 +6,8 @@ type BanchoUserResponse struct {
 	Username  string `json:"username"`
 }
 
-func (b BanchoUserResponse) ToUser() User {
-	return User{
-		ID:       b.ID,
-		Username: b.Username,
+func (self BanchoUserResponse) ToUserDto() UserDto {
+	return UserDto{
+		BanchoUserResponse: self,
 	}
 }

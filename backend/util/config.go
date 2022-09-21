@@ -13,6 +13,8 @@ type config struct {
 	BanchoOauthClientID     string
 	BanchoOauthClientSecret string
 	BanchoOauthRedirectURL  string
+	// Frontend
+	FrontendURL string
 }
 
 var Config config
@@ -26,4 +28,6 @@ func init() {
 	if Config.BanchoOauthClientID == "" || Config.BanchoOauthClientSecret == "" || Config.BanchoOauthRedirectURL == "" {
 		panic("bancho oauth values are not set")
 	}
+
+	Config.FrontendURL = os.Getenv("FRONTEND_URL")
 }

@@ -9,31 +9,29 @@ import (
 )
 
 func List(ctx *fiber.Ctx) error {
-	dbSession := services.GetDebugSession()
+	dbSession := services.GetDebugDBSession()
 
 	var users []entities.User
 
 	dbSession.Find(&users)
 
-	res := []models.User{}
+	res := []models.UserDto{}
 	for _, user := range users {
-		res = append(res, user.BanchoUser)
+		res = append(res, models.UserDtoFromEntity(user))
 	}
 
 	return ctx.JSON(res)
 }
 
 func Get(ctx *fiber.Ctx) error {
-	dbSession := services.GetDebugSession()
+	dbSession := services.GetDebugDBSession()
 
-	user := entities.User{}
-	dbSession.Find(&user, "id = ?", ctx.Params("id"))
-
-	res := user.BanchoUser
+	res := entities.User{}
+	dbSession.Find(&res, "id = ?", ctx.Params("id"))
 
 	if res.ID == 0 && res.Username == "" {
 		return ctx.Status(fiber.StatusOK).JSON(fiber.Map{})
 	}
 
-	return ctx.JSON(res)
+	return ctx.JSON(models.UserDtoFromEntity(res))
 }

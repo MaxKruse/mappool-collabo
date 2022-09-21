@@ -2,12 +2,17 @@ package oauth
 
 import (
 	"backend/models"
+	"backend/models/entities"
+	"backend/services"
 	"backend/util"
 	"context"
+	"errors"
 	"log"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 	"golang.org/x/oauth2"
+	"gorm.io/gorm"
 )
 
 var (
@@ -57,9 +62,72 @@ func Login(ctx *fiber.Ctx) error {
 		return err
 	}
 
-	converted := util.Convert[models.BanchoUserResponse](resp.Body)
+	converted, err := util.Convert[models.BanchoUserResponse](resp.Body)
+	if err != nil {
+		return err
+	}
 
-	return ctx.JSON(converted.ToUser())
+	sessionToken := makeSessionToken(converted)
+
+	err = saveUser(converted, sessionToken)
+	if err != nil {
+		return err
+	}
+
+	return ctx.Redirect(util.Config.FrontendURL + "/login?token=" + sessionToken)
+}
+
+func saveUser(user models.BanchoUserResponse, sessionToken string) error {
+	db := services.GetDebugDBSession()
+
+	// get existing user from db, by id
+	var existingUser entities.User
+	db.First(&existingUser, user.ID)
+
+	// make the session variable in any case
+	session := entities.Session{
+		UserId:    int(user.ID),
+		AuthToken: sessionToken,
+	}
+
+	// if user exists, add the session token to the existing user
+	if existingUser.ID != 0 {
+		existingUser.Sessions = append(existingUser.Sessions, session)
+		db.Save(&existingUser)
+	} else {
+		// if user does not exist, create a new user and add the session token
+		newUser := entities.User{
+			Model:     gorm.Model{ID: uint(user.ID)},
+			Sessions:  []entities.Session{session},
+			AvatarUrl: user.AvatarUrl,
+			Username:  user.Username,
+		}
+		db.Create(&newUser)
+	}
+
+	// attempt to find the session we just saved by auth token
+	var savedSession entities.Session
+	db.Where("auth_token = ?", sessionToken).First(&savedSession)
+
+	// find the user for the session we just saved
+	var savedUser entities.User
+	db.First(&savedUser, savedSession.UserId)
+
+	if savedUser.ID == 0 {
+		return errors.New("could not save user correctly to database")
+	}
+	return nil
+}
+
+func makeSessionToken(user models.BanchoUserResponse) string {
+	// generate a random uuid
+	res, err := uuid.NewUUID()
+	if err != nil {
+		return ""
+	}
+
+	// return the uuid as a string
+	return res.String()
 }
 
 func getOauth(ctx *fiber.Ctx, oauthConfig *oauth2.Config, code string) (*oauth2.Token, error) {
