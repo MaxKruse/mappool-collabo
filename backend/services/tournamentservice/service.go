@@ -7,11 +7,11 @@ import (
 	"backend/services/userservice"
 )
 
-func GetTournament[k comparable](id k) models.TournamentDto {
+func GetTournament[k comparable](id k) (models.TournamentDto, error) {
 	dbSession := database.GetDBSession()
 	var tournament entities.Tournament
-	dbSession.Preload("Owner").Preload("Testplayers").Preload("Poolers").First(&tournament, id)
-	return models.TournamentDtoFromEntity(tournament)
+	err := dbSession.Preload("Owner").Preload("Testplayers").Preload("Poolers").First(&tournament, id).Error
+	return models.TournamentDtoFromEntity(tournament), err
 }
 
 func GetTournaments() []models.TournamentDto {
@@ -50,9 +50,10 @@ func CreateTournament(tournament models.TournamentDto) (models.TournamentDto, er
 	return models.TournamentDtoFromEntity(tournamentEntity), nil
 }
 
-func UpdateTournament(tournament models.TournamentDto) models.TournamentDto {
+func UpdateTournament(tournament models.TournamentDto) (models.TournamentDto, error) {
 	// Update if values are not empty
 	dbSession := database.GetDBSession()
+
 	var tournamentEntity entities.Tournament
 	dbSession.First(&tournamentEntity, tournament.ID)
 
@@ -78,10 +79,16 @@ func UpdateTournament(tournament models.TournamentDto) models.TournamentDto {
 	}
 
 	dbSession.Save(&tournamentEntity)
-	return models.TournamentDtoFromEntity(tournamentEntity)
+
+	res, err := GetTournament(tournament.ID)
+	if err != nil {
+		return models.TournamentDto{}, err
+	}
+
+	return res, nil
 }
 
-func DeleteTournament(id uint) error {
+func DeleteTournament[k comparable](id k) error {
 	dbSession := database.GetDBSession()
 	var tournament entities.Tournament
 	err := dbSession.Delete(&tournament, id).Error
