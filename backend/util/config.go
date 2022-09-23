@@ -25,6 +25,11 @@ func init() {
 	Config.BanchoOauthRedirectURL = os.Getenv("BANCHO_OAUTH_REDIRECT_URL")
 	Config.DatabaseURI = os.Getenv("DATABASE_URI")
 
+	// make sure the database uri is set. if not, default it to "development.db"
+	if Config.DatabaseURI == "" {
+		Config.DatabaseURI = "development.db"
+	}
+
 	// check if the oauth values are set
 	if Config.BanchoOauthClientID == "" || Config.BanchoOauthClientSecret == "" || Config.BanchoOauthRedirectURL == "" {
 		panic("bancho oauth values are not set")
