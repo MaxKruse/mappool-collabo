@@ -11,7 +11,8 @@ func UserDtoFromEntity(user entities.User) UserDto {
 		BanchoUserResponse: BanchoUserResponse{
 			ID:        user.ID,
 			Username:  user.Username,
-			AvatarUrl: user.AvatarUrl},
+			AvatarUrl: user.AvatarUrl,
+		},
 	}
 }
 
