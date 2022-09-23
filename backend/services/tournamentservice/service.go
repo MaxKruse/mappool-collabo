@@ -10,14 +10,14 @@ import (
 func GetTournament[k comparable](id k) models.TournamentDto {
 	dbSession := database.GetDBSession()
 	var tournament entities.Tournament
-	dbSession.First(&tournament, id)
+	dbSession.Preload("Owner").Preload("Testplayers").Preload("Poolers").First(&tournament, id)
 	return models.TournamentDtoFromEntity(tournament)
 }
 
 func GetTournaments() []models.TournamentDto {
 	dbSession := database.GetDBSession()
 	var tournaments []entities.Tournament
-	dbSession.Find(&tournaments)
+	dbSession.Preload("Owner").Preload("Testplayers").Preload("Poolers").Find(&tournaments)
 	return models.TournamentDtoListFromEntityList(tournaments)
 }
 
