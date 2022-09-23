@@ -8,7 +8,7 @@ import (
 
 type config struct {
 	// Database
-	DatabaseURI string `default:":memory:"`
+	DatabaseURI string
 	// Oauth for bancho
 	BanchoOauthClientID     string
 	BanchoOauthClientSecret string
@@ -23,6 +23,7 @@ func init() {
 	Config.BanchoOauthClientID = os.Getenv("BANCHO_OAUTH_CLIENT_ID")
 	Config.BanchoOauthClientSecret = os.Getenv("BANCHO_OAUTH_CLIENT_SECRET")
 	Config.BanchoOauthRedirectURL = os.Getenv("BANCHO_OAUTH_REDIRECT_URL")
+	Config.DatabaseURI = os.Getenv("DATABASE_URI")
 
 	// check if the oauth values are set
 	if Config.BanchoOauthClientID == "" || Config.BanchoOauthClientSecret == "" || Config.BanchoOauthRedirectURL == "" {

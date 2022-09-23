@@ -2,6 +2,7 @@ package database
 
 import (
 	"backend/models/entities"
+	"backend/util"
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -12,7 +13,7 @@ var db *gorm.DB
 var err error
 
 func init() {
-	db, err = gorm.Open(sqlite.Open("development.db"), &gorm.Config{
+	db, err = gorm.Open(sqlite.Open(util.Config.DatabaseURI), &gorm.Config{
 		Logger: logger.Default,
 	})
 	if err != nil {
