@@ -7,8 +7,8 @@ type TournamentDto struct {
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
 	Owner       UserDto   `json:"owner"`
-	Poolers     []UserDto `json:"poolers"`
-	Testplayers []UserDto `json:"testplayers"`
+	Poolers     []UserDto `json:"poolers,omitempty"`
+	Testplayers []UserDto `json:"testplayers,omitempty"`
 }
 
 func TournamentDtoFromEntity(tournament entities.Tournament) TournamentDto {
