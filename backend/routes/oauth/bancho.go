@@ -3,7 +3,8 @@ package oauth
 import (
 	"backend/models"
 	"backend/models/entities"
-	"backend/services"
+	"backend/services/database"
+	"backend/services/userservice"
 	"backend/util"
 	"context"
 	"errors"
@@ -78,7 +79,7 @@ func Login(ctx *fiber.Ctx) error {
 }
 
 func saveUser(user models.BanchoUserResponse, sessionToken string) error {
-	db := services.GetDebugDBSession()
+	db := database.GetDebugDBSession()
 
 	// get existing user from db, by id
 	var existingUser entities.User
@@ -106,7 +107,7 @@ func saveUser(user models.BanchoUserResponse, sessionToken string) error {
 	}
 
 	// find the user for the session we just saved
-	savedUser, err := services.GetUserFromToken(sessionToken)
+	savedUser, err := userservice.GetUserFromToken(sessionToken)
 	if err != nil {
 		return err
 	}

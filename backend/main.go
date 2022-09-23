@@ -2,7 +2,8 @@ package main
 
 import (
 	"backend/routes/oauth"
-	"backend/routes/users"
+	"backend/routes/tournament"
+	"backend/routes/user"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
@@ -29,14 +30,23 @@ func main() {
 	// Our groups
 	usersGroup := app.Group("/user")
 	{
-		usersGroup.Get("/", users.List)
-		usersGroup.Get("/self", users.GetSelf)
-		usersGroup.Get("/:id", users.Get)
+		usersGroup.Get("/", user.List)
+		usersGroup.Get("/self", user.GetSelf)
+		usersGroup.Get("/:id", user.Get)
 	}
 
 	oauthGroup := app.Group("/oauth")
 	{
 		oauthGroup.Get("/login", oauth.Login)
+	}
+
+	tournamentGroup := app.Group("/tournament")
+	{
+		tournamentGroup.Get("/", tournament.List)
+		tournamentGroup.Get("/:id", tournament.Get)
+		tournamentGroup.Post("/", tournament.Create)
+		tournamentGroup.Put("/:id", tournament.Update)
+		tournamentGroup.Delete("/:id", tournament.Delete)
 	}
 
 	// run the app
