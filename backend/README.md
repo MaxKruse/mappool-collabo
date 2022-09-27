@@ -7,10 +7,10 @@
 - [ ] create mappool
 - [ ] permissions (groups)
 - [ ] invites
-- [ ] suggestions to mappool
-- [ ] feedback for maps
-- [ ] voting for maps
-- [ ] add map to mappool
+- [x] suggestions to mappool
+- [x] feedback for maps
+- [x] voting for maps
+- [x] add map to mappool
 - [ ] replay upload
 - [ ] replay picking
 
