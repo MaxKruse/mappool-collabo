@@ -18,7 +18,8 @@ const (
 	DepthRounds      = 1 << iota
 	DepthMappool     = 1 << iota
 	DepthSuggestions = 1 << iota
-	DepthAll         = DepthOwner | DepthPoolers | DepthTestplayers | DepthRounds | DepthMappool | DepthSuggestions
+	DepthMaps        = 1 << iota
+	DepthAll         = DepthOwner | DepthPoolers | DepthTestplayers | DepthRounds | DepthMappool | DepthSuggestions | DepthMaps
 	DepthBasic       = DepthOwner | DepthPoolers | DepthTestplayers
 )
 
@@ -47,6 +48,11 @@ func preloadFromDepth(db *gorm.DB, depth int) *gorm.DB {
 
 	if depth&DepthSuggestions != 0 {
 		preloads = preloads.Preload("Rounds.Suggestions")
+	}
+
+	if depth&DepthMaps != 0 {
+		preloads = preloads.Preload("Rounds.Mappool.Maps")
+		preloads = preloads.Preload("Rounds.Suggestions.Maps")
 	}
 
 	return preloads

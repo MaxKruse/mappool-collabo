@@ -1,6 +1,8 @@
 package entities
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+)
 
 // A slot can be used by many maps, and many maps can have this specific slot.
 type Slot struct {

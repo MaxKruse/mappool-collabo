@@ -1,6 +1,8 @@
 package entities
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+)
 
 type Suggestion struct {
 	gorm.Model
@@ -8,7 +10,6 @@ type Suggestion struct {
 	AuthorID uint
 	Map      Map
 	MapID    uint
-	Round    Round
 	RoundID  uint
 	Comment  string
 	Votes    []Vote

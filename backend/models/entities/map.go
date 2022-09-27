@@ -9,12 +9,13 @@ import (
 type Map struct {
 	gorm.Model
 	Name        string `json:"name"`
-	Slot        Slot   `json:"slot" gorm:"many2many:map_slots;"`
+	Link        string `json:"link"`
+	PlaySlot    Slot   `json:"slot" gorm:"many2many:map_slots;"`
 	Description string `json:"description"`
 }
 
 func (m Map) SlotName() string {
-	slotIndexStr := fmt.Sprintf("%d", m.Slot.Index)
+	slotIndexStr := fmt.Sprintf("%d", m.PlaySlot.Index)
 
-	return m.Slot.Name + slotIndexStr
+	return m.PlaySlot.Name + slotIndexStr
 }
