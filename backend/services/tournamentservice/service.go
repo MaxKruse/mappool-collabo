@@ -5,12 +5,59 @@ import (
 	"backend/models/entities"
 	"backend/services/database"
 	"backend/services/userservice"
+
+	"gorm.io/gorm"
 )
 
-func GetTournament[k comparable](id k) (models.TournamentDto, error) {
+// enum for level of depth
+const (
+	DepthNone        = 1 << iota
+	DepthOwner       = 1 << iota
+	DepthPoolers     = 1 << iota
+	DepthTestplayers = 1 << iota
+	DepthRounds      = 1 << iota
+	DepthMappool     = 1 << iota
+	DepthSuggestions = 1 << iota
+	DepthAll         = DepthOwner | DepthPoolers | DepthTestplayers | DepthRounds | DepthMappool | DepthSuggestions
+	DepthBasic       = DepthOwner | DepthPoolers | DepthTestplayers
+)
+
+func preloadFromDepth(db *gorm.DB, depth int) *gorm.DB {
+	preloads := db
+
+	if depth&DepthOwner != 0 {
+		preloads = preloads.Preload("Owner")
+	}
+
+	if depth&DepthPoolers != 0 {
+		preloads = preloads.Preload("Poolers")
+	}
+
+	if depth&DepthTestplayers != 0 {
+		preloads = preloads.Preload("Testplayers")
+	}
+
+	if depth&DepthRounds != 0 {
+		preloads = preloads.Preload("Rounds")
+	}
+
+	if depth&DepthMappool != 0 {
+		preloads = preloads.Preload("Rounds.Mappool")
+	}
+
+	if depth&DepthSuggestions != 0 {
+		preloads = preloads.Preload("Rounds.Suggestions")
+	}
+
+	return preloads
+}
+
+func GetTournament[k comparable](id k, depth int) (models.TournamentDto, error) {
 	dbSession := database.GetDBSession()
 	var tournament entities.Tournament
-	preloads := dbSession.Preload("Owner").Preload("Testplayers").Preload("Poolers").Preload("Rounds.Mappool")
+
+	preloads := preloadFromDepth(dbSession, depth)
+
 	err := preloads.First(&tournament, id).Error
 	return models.TournamentDtoFromEntity(tournament), err
 }
@@ -18,7 +65,7 @@ func GetTournament[k comparable](id k) (models.TournamentDto, error) {
 func GetTournaments() []models.TournamentDto {
 	dbSession := database.GetDBSession()
 	var tournaments []entities.Tournament
-	dbSession.Preload("Owner").Preload("Testplayers").Preload("Poolers").Find(&tournaments)
+	preloadFromDepth(dbSession, DepthBasic).Find(&tournaments)
 	return models.TournamentDtoListFromEntityList(tournaments)
 }
 
@@ -81,7 +128,7 @@ func UpdateTournament(tournament models.TournamentDto) (models.TournamentDto, er
 
 	dbSession.Save(&tournamentEntity)
 
-	res, err := GetTournament(tournament.ID)
+	res, err := GetTournament(tournament.ID, DepthAll)
 	if err != nil {
 		return models.TournamentDto{}, err
 	}

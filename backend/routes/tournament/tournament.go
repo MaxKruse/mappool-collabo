@@ -15,7 +15,7 @@ func List(c *fiber.Ctx) error {
 
 func Get(c *fiber.Ctx) error {
 	id := c.Params("id")
-	tournament, err := tournamentservice.GetTournament(id)
+	tournament, err := tournamentservice.GetTournament(id, tournamentservice.DepthBasic)
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Not found"})
 	}
@@ -56,7 +56,7 @@ func Update(c *fiber.Ctx) error {
 
 	// get tournament from path param
 	id := c.Params("id")
-	tournament, err := tournamentservice.GetTournament(id)
+	tournament, err := tournamentservice.GetTournament(id, tournamentservice.DepthBasic)
 
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Not found"})
@@ -93,7 +93,7 @@ func Delete(c *fiber.Ctx) error {
 
 	// get tournament from path param
 	id := c.Params("id")
-	tournament, err := tournamentservice.GetTournament(id)
+	tournament, err := tournamentservice.GetTournament(id, tournamentservice.DepthNone)
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Not found"})
 	}
