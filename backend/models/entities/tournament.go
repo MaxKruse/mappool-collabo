@@ -8,7 +8,7 @@ type Tournament struct {
 	gorm.Model
 	Name        string
 	Description string
-	Owner       User `gorm:"foreignKey:OwnerID"`
+	Owner       User
 	OwnerID     uint
 	Poolers     []User `gorm:"many2many:tournament_poolers;"`
 	Testplayers []User `gorm:"many2many:tournament_testplayers;"`

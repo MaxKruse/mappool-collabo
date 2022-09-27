@@ -31,3 +31,21 @@ func TournamentDtoListFromEntityList(tournaments []entities.Tournament) []Tourna
 	}
 	return res
 }
+
+func (t TournamentDto) IsPooler(user entities.User) bool {
+	for _, pooler := range t.Poolers {
+		if pooler.ID == user.ID {
+			return true
+		}
+	}
+	return false
+}
+
+func (t TournamentDto) IsTestplayer(user entities.User) bool {
+	for _, testplayer := range t.Testplayers {
+		if testplayer.ID == user.ID {
+			return true
+		}
+	}
+	return false
+}

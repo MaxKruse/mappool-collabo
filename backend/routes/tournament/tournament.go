@@ -15,10 +15,26 @@ func List(c *fiber.Ctx) error {
 
 func Get(c *fiber.Ctx) error {
 	id := c.Params("id")
+
+	self, _ := userservice.GetUserFromToken(c.Get("Authorization")[7:])
+
 	tournament, err := tournamentservice.GetTournament(id, tournamentservice.DepthBasic)
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Not found"})
 	}
+
+	// if we are the owner, one of the testplayers or poolers, we get the full tournament
+
+	isPooler := tournament.IsPooler(self)
+	isTestplayer := tournament.IsTestplayer(self)
+
+	if tournament.Owner.ID == self.ID || isPooler || isTestplayer {
+		tournament, err = tournamentservice.GetTournament(id, tournamentservice.DepthAll)
+		if err != nil {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Not found"})
+		}
+	}
+
 	return c.JSON(tournament)
 }
 

@@ -6,11 +6,11 @@ import (
 
 type Suggestion struct {
 	gorm.Model
+	RoundId  uint
 	Author   User
-	AuthorID uint
+	AuthorId uint
 	Map      Map
-	MapID    uint
-	RoundID  uint
+	MapId    uint
 	Comment  string
 	Votes    []Vote
 }

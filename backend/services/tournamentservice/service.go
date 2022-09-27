@@ -43,16 +43,21 @@ func preloadFromDepth(db *gorm.DB, depth int) *gorm.DB {
 	}
 
 	if depth&DepthMappool != 0 {
-		preloads = preloads.Preload("Rounds.Mappool")
+		preloads = preloads.Preload("Rounds.Mappool.PlaySlot")
 	}
 
 	if depth&DepthSuggestions != 0 {
-		preloads = preloads.Preload("Rounds.Suggestions")
+		preloads = preloads.Preload("Rounds.Suggestions.Votes.Author")
+		preloads = preloads.Preload("Rounds.Suggestions.Map.PlaySlot")
+		preloads = preloads.Preload("Rounds.Suggestions.Author")
 	}
 
 	if depth&DepthMaps != 0 {
-		preloads = preloads.Preload("Rounds.Mappool.Maps")
-		preloads = preloads.Preload("Rounds.Suggestions.Maps")
+		preloads = preloads.Preload("Rounds.Mappool.PlaySlot")
+
+		preloads = preloads.Preload("Rounds.Suggestions.Votes.Author")
+		preloads = preloads.Preload("Rounds.Suggestions.Map.PlaySlot")
+		preloads = preloads.Preload("Rounds.Suggestions.Author")
 	}
 
 	return preloads

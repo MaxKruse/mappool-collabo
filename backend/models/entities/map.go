@@ -8,10 +8,13 @@ import (
 
 type Map struct {
 	gorm.Model
-	Name        string `json:"name"`
-	Link        string `json:"link"`
-	PlaySlot    Slot   `json:"slot" gorm:"many2many:map_slots;"`
-	Description string `json:"description"`
+	Name        string
+	Link        string
+	PlaySlot    Slot
+	Description string
+	Suggestions []Suggestion
+	Round       Round
+	RoundId     uint
 }
 
 func (m Map) SlotName() string {

@@ -3,10 +3,11 @@ package models
 import "backend/models/entities"
 
 type SuggestionDto struct {
-	ID          uint   `json:"id"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Votes       int    `json:"votes"`
+	ID        uint      `json:"id"`
+	Comment   string    `json:"comment"`
+	Map       MapDto    `json:"map"`
+	Votes     []VoteDto `json:"votes,omitempty"`
+	VoteScore int       `json:"voteScore"`
 }
 
 func SuggestionDtoFromEntity(suggestion entities.Suggestion) SuggestionDto {
@@ -16,10 +17,11 @@ func SuggestionDtoFromEntity(suggestion entities.Suggestion) SuggestionDto {
 	}
 
 	return SuggestionDto{
-		ID:          suggestion.ID,
-		Name:        suggestion.Map.Name,
-		Description: suggestion.Map.Description,
-		Votes:       votes,
+		ID:        suggestion.ID,
+		Comment:   suggestion.Comment,
+		Map:       MapDtoFromEntity(suggestion.Map),
+		Votes:     VoteDtoListFromEntityList(suggestion.Votes),
+		VoteScore: votes,
 	}
 }
 
