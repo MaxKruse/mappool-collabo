@@ -24,6 +24,10 @@ func init() {
 	db.AutoMigrate(&entities.Session{})
 	db.AutoMigrate(&entities.User{})
 	db.AutoMigrate(&entities.Tournament{})
+	db.AutoMigrate(&entities.Round{})
+	db.AutoMigrate(&entities.Map{})
+	db.AutoMigrate(&entities.Suggestion{})
+	db.AutoMigrate(&entities.Vote{})
 
 }
 

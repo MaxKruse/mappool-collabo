@@ -64,7 +64,7 @@ Authentiation is to be provided via `Authorization: Bearer <token>` where the to
 ``` 
 
 1. GET /tournament/ - Lists all tournaments
-2. GET /tournament/{id} - Get a specific tournament
+2. GET /tournament/{id} - Get a specific tournament (includes mappool)
 3. POST /tournament/ - Create a tournament
 4. PUT /tournament/{id} - Update a tournament
 5. DELETE /tournament/{id} - Delete a tournament

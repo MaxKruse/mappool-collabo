@@ -10,4 +10,5 @@ type Tournament struct {
 	OwnerID     uint
 	Poolers     []User `gorm:"many2many:tournament_poolers;"`
 	Testplayers []User `gorm:"many2many:tournament_testplayers;"`
+	Rounds      []Round
 }

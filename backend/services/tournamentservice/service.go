@@ -10,7 +10,8 @@ import (
 func GetTournament[k comparable](id k) (models.TournamentDto, error) {
 	dbSession := database.GetDBSession()
 	var tournament entities.Tournament
-	err := dbSession.Preload("Owner").Preload("Testplayers").Preload("Poolers").First(&tournament, id).Error
+	preloads := dbSession.Preload("Owner").Preload("Testplayers").Preload("Poolers").Preload("Rounds.Mappool")
+	err := preloads.First(&tournament, id).Error
 	return models.TournamentDtoFromEntity(tournament), err
 }
 
