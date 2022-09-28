@@ -10,6 +10,12 @@ import (
 
 func List(c *fiber.Ctx) error {
 	tournaments := tournamentservice.GetTournaments()
+
+	// if there are no tournaments, force an empty array
+	if tournaments == nil {
+		tournaments = []models.TournamentDto{}
+	}
+
 	return c.JSON(tournaments)
 }
 
