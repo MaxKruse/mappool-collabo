@@ -49,14 +49,14 @@ func Login(ctx *fiber.Ctx) error {
 		return ctx.Redirect(oauthConfig.AuthCodeURL(id))
 	}
 
-	token, err := getOauth(ctx, &oauthConfig, code)
+	oauthToken, err := getOauth(ctx, &oauthConfig, code)
 
 	if err != nil {
 		log.Println(err)
 		return err
 	}
 
-	client := oauthConfig.Client(context.Background(), token)
+	client := oauthConfig.Client(context.Background(), oauthToken)
 
 	resp, err := client.Get("https://osu.ppy.sh/api/v2/me/")
 	if err != nil {
@@ -70,7 +70,7 @@ func Login(ctx *fiber.Ctx) error {
 
 	sessionToken := makeSessionToken(converted)
 
-	err = saveUser(converted, sessionToken)
+	err = saveUser(converted, sessionToken, oauthToken)
 	if err != nil {
 		return err
 	}
@@ -78,7 +78,7 @@ func Login(ctx *fiber.Ctx) error {
 	return ctx.Redirect(util.Config.FrontendURL + "/login?token=" + sessionToken)
 }
 
-func saveUser(user models.BanchoUserResponse, sessionToken string) error {
+func saveUser(user models.BanchoUserResponse, sessionToken string, oauthToken *oauth2.Token) error {
 	db := database.GetDebugDBSession()
 
 	// get existing user from db, by id
@@ -94,6 +94,7 @@ func saveUser(user models.BanchoUserResponse, sessionToken string) error {
 	// if user exists, add the session token to the existing user
 	if existingUser.ID != 0 {
 		existingUser.Sessions = append(existingUser.Sessions, session)
+		existingUser.Token = *oauthToken
 		db.Save(&existingUser)
 	} else {
 		// if user does not exist, create a new user and add the session token
@@ -102,6 +103,7 @@ func saveUser(user models.BanchoUserResponse, sessionToken string) error {
 			Sessions:  []entities.Session{session},
 			AvatarUrl: user.AvatarUrl,
 			Username:  user.Username,
+			Token:     *oauthToken,
 		}
 		db.Create(&newUser)
 	}
