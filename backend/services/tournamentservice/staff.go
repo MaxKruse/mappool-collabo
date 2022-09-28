@@ -2,6 +2,7 @@ package tournamentservice
 
 import (
 	"backend/models"
+	"backend/services/database"
 	"backend/services/userservice"
 	"errors"
 )
@@ -74,12 +75,10 @@ func RemoveMappooler(auth_token string, tournamentID uint, userID uint) error {
 		return errors.New("user is not a pooler")
 	}
 
-	tourney.Poolers = append(tourney.Poolers[:poolerIndex], tourney.Poolers[poolerIndex+1:]...)
+	// remove the pooler
+	pooler := tourney.Poolers[poolerIndex]
 
-	tourneyDto := models.TournamentDto{}
-	tourneyDto.ID = tourney.ID
-	tourneyDto.Poolers = models.UserDtoListFromEntityList(tourney.Poolers)
-
-	_, err = UpdateTournament(tourneyDto)
+	dbSession := database.GetDBSession()
+	err = dbSession.Model(&tourney).Association("Poolers").Delete(&pooler)
 	return err
 }

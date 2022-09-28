@@ -46,5 +46,5 @@ func RemoveMappooler(c *fiber.Ctx) error {
 	}
 
 	// return a 200
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{"message": "Mappooler removed"})
+	return c.Status(fiber.StatusNoContent).JSON(fiber.Map{"message": "Mappooler removed"})
 }
