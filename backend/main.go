@@ -28,7 +28,7 @@ func main() {
 	// make session
 
 	// Our groups
-	usersGroup := app.Group("/user")
+	usersGroup := app.Group("/users")
 	{
 		usersGroup.Get("/", user.List)
 		usersGroup.Get("/self", user.GetSelf)
@@ -40,7 +40,7 @@ func main() {
 		oauthGroup.Get("/login", oauth.Login)
 	}
 
-	tournamentGroup := app.Group("/tournament")
+	tournamentGroup := app.Group("/tournaments")
 	{
 		tournamentGroup.Get("/", tournament.List)
 		tournamentGroup.Get("/:id", tournament.Get)
