@@ -63,14 +63,14 @@ func preloadFromDepth(db *gorm.DB, depth int) *gorm.DB {
 	return preloads
 }
 
-func GetTournament[k comparable](id k, depth int) (models.TournamentDto, error) {
+func GetTournament[k comparable](id k, depth int) (entities.Tournament, error) {
 	dbSession := database.GetDBSession()
 	var tournament entities.Tournament
 
 	preloads := preloadFromDepth(dbSession, depth)
 
 	err := preloads.First(&tournament, id).Error
-	return models.TournamentDtoFromEntity(tournament), err
+	return tournament, err
 }
 
 func GetTournaments() []models.TournamentDto {
@@ -80,7 +80,7 @@ func GetTournaments() []models.TournamentDto {
 	return models.TournamentDtoListFromEntityList(tournaments)
 }
 
-func CreateTournament(tournament models.TournamentDto) (models.TournamentDto, error) {
+func CreateTournament(tournament models.TournamentDto) (entities.Tournament, error) {
 	dbSession := database.GetDBSession()
 	var err error
 	var tournamentEntity entities.Tournament
@@ -91,7 +91,7 @@ func CreateTournament(tournament models.TournamentDto) (models.TournamentDto, er
 	tournamentEntity.Description = tournament.Description
 	tournamentEntity.Owner, err = userservice.GetUserFromId(tournament.Owner.ID)
 	if err != nil {
-		return models.TournamentDto{}, err
+		return entities.Tournament{}, err
 	}
 
 	// Poolers and Testplayers are optional
@@ -106,10 +106,10 @@ func CreateTournament(tournament models.TournamentDto) (models.TournamentDto, er
 	}
 
 	dbSession.Create(&tournamentEntity)
-	return models.TournamentDtoFromEntity(tournamentEntity), nil
+	return tournamentEntity, nil
 }
 
-func UpdateTournament(tournament models.TournamentDto) (models.TournamentDto, error) {
+func UpdateTournament(tournament models.TournamentDto) (entities.Tournament, error) {
 	// Update if values are not empty
 	dbSession := database.GetDBSession()
 
@@ -141,7 +141,7 @@ func UpdateTournament(tournament models.TournamentDto) (models.TournamentDto, er
 
 	res, err := GetTournament(tournament.ID, DepthAll)
 	if err != nil {
-		return models.TournamentDto{}, err
+		return entities.Tournament{}, err
 	}
 
 	return res, nil

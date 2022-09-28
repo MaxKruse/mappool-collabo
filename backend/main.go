@@ -49,6 +49,11 @@ func main() {
 		tournamentGroup.Delete("/:id", tournament.Delete)
 	}
 
+	mappoolerGroup := app.Group("/mappoolers")
+	{
+		mappoolerGroup.Post("/", tournament.AddMappooler)
+	}
+
 	// run the app
 	app.Listen(":5000")
 }

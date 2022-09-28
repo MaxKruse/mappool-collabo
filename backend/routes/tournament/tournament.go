@@ -2,6 +2,7 @@ package tournament
 
 import (
 	"backend/models"
+	"backend/models/entities"
 	"backend/services/tournamentservice"
 	"backend/services/userservice"
 
@@ -21,13 +22,22 @@ func List(c *fiber.Ctx) error {
 
 func Get(c *fiber.Ctx) error {
 	id := c.Params("id")
+	token := c.Get("Authorization")
 
-	self, _ := userservice.GetUserFromToken(c.Get("Authorization")[7:])
+	var self entities.User
 
-	tournament, err := tournamentservice.GetTournament(id, tournamentservice.DepthBasic)
+	if token == "" {
+		self = entities.User{}
+	} else {
+		self, _ = userservice.GetUserFromToken(token[7:])
+	}
+
+	tournamentEntity, err := tournamentservice.GetTournament(id, tournamentservice.DepthBasic)
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Not found"})
 	}
+
+	tournament := models.TournamentDtoFromEntity(tournamentEntity)
 
 	// if we are the owner, one of the testplayers or poolers, we get the full tournament
 
@@ -35,13 +45,13 @@ func Get(c *fiber.Ctx) error {
 	isTestplayer := tournament.IsTestplayer(self)
 
 	if tournament.Owner.ID == self.ID || isPooler || isTestplayer {
-		tournament, err = tournamentservice.GetTournament(id, tournamentservice.DepthAll)
+		tournamentEntity, err = tournamentservice.GetTournament(id, tournamentservice.DepthAll)
 		if err != nil {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Not found"})
 		}
 	}
 
-	return c.JSON(tournament)
+	return c.JSON(models.TournamentDtoFromEntity(tournamentEntity))
 }
 
 func Create(c *fiber.Ctx) error {
@@ -66,7 +76,7 @@ func Create(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Bad request"})
 	}
 
-	return c.JSON(newTournament)
+	return c.JSON(models.TournamentDtoFromEntity(newTournament))
 }
 
 func Update(c *fiber.Ctx) error {
@@ -103,7 +113,7 @@ func Update(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Internal server error"})
 	}
 
-	return c.JSON(updatedTournament)
+	return c.JSON(models.TournamentDtoFromEntity(updatedTournament))
 }
 
 func Delete(c *fiber.Ctx) error {
