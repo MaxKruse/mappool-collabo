@@ -11,10 +11,16 @@ type Session struct {
 	AuthToken string
 }
 
+type Token struct {
+	gorm.Model
+	oauth2.Token
+	UserId uint
+}
+
 type User struct {
 	gorm.Model
 	Sessions  []Session
 	AvatarUrl string
 	Username  string
-	Token     oauth2.Token
+	Token     Token
 }

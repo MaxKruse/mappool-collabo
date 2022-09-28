@@ -119,6 +119,7 @@ func init() {
 	db.AutoMigrate(&entities.Map{})
 	db.AutoMigrate(&entities.Suggestion{})
 	db.AutoMigrate(&entities.Vote{})
+	db.AutoMigrate(&entities.Token{})
 
 	// check if we are using in-memory database
 	if isDevelopment() {
