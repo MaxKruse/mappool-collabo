@@ -1,6 +1,7 @@
 package entities
 
 import (
+	"golang.org/x/oauth2"
 	"gorm.io/gorm"
 )
 
@@ -15,4 +16,5 @@ type User struct {
 	Sessions  []Session
 	AvatarUrl string
 	Username  string
+	Token     oauth2.Token
 }
