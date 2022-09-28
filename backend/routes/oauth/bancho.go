@@ -30,13 +30,13 @@ var (
 	}
 )
 
-func Login(ctx *fiber.Ctx) error {
-	sess, err := util.GetSession(ctx)
+func Login(c *fiber.Ctx) error {
+	sess, err := util.GetSession(c)
 	if err != nil {
 		return err
 	}
 
-	code := ctx.Query("code")
+	code := c.Query("code")
 	if code == "" {
 		sess.Regenerate()
 		id := sess.ID()
@@ -46,10 +46,10 @@ func Login(ctx *fiber.Ctx) error {
 			return err
 		}
 
-		return ctx.Redirect(oauthConfig.AuthCodeURL(id))
+		return c.Redirect(oauthConfig.AuthCodeURL(id))
 	}
 
-	oauthToken, err := getOauth(ctx, &oauthConfig, code)
+	oauthToken, err := getOauth(c, &oauthConfig, code)
 
 	if err != nil {
 		log.Println(err)
@@ -75,7 +75,7 @@ func Login(ctx *fiber.Ctx) error {
 		return err
 	}
 
-	return ctx.Redirect(util.Config.FrontendURL + "/login?token=" + sessionToken)
+	return c.Redirect(util.Config.FrontendURL + "/login?token=" + sessionToken)
 }
 
 func saveUser(user models.BanchoUserResponse, sessionToken string, oauthToken *oauth2.Token) error {
@@ -135,15 +135,15 @@ func makeSessionToken(user models.BanchoUserResponse) string {
 	return res.String()
 }
 
-func getOauth(ctx *fiber.Ctx, oauthConfig *oauth2.Config, code string) (*oauth2.Token, error) {
-	sess, err := util.GetSession(ctx)
+func getOauth(c *fiber.Ctx, oauthConfig *oauth2.Config, code string) (*oauth2.Token, error) {
+	sess, err := util.GetSession(c)
 	if err != nil {
 		return nil, err
 	}
 	// Read oauthState from Cookie
 	oauth_state := sess.Get("oauth_state")
 
-	if ctx.Query("state") != oauth_state {
+	if c.Query("state") != oauth_state {
 		return nil, errors.New("invalid oauth state")
 	}
 

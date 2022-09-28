@@ -9,6 +9,15 @@ import (
 func GetUserFromToken(token string) (entities.User, error) {
 	dbSession := database.GetDBSession()
 
+	// ensure the token has the format of
+	// "Bearer <token>"
+	if len(token) < 7 || token[:7] != "Bearer " {
+		return entities.User{}, errors.New("invalid token format")
+	}
+
+	// truncate the "Bearer " part
+	token = token[7:]
+
 	authToken := entities.Session{}
 	err := dbSession.Find(&authToken, "auth_token = ?", token).Error
 	if err != nil {

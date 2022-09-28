@@ -7,30 +7,44 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func AddMappooler(ctx *fiber.Ctx) error {
-	// make sure the user is logged in by checking for the Authorization header
-	// if the user is not logged in, return a 401
-
-	token := ctx.Get("Authorization")
-	if token == "" {
-		return ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
-	}
-
+func AddMappooler(c *fiber.Ctx) error {
 	// bodyparse the MappoolerDto
 	// if the body is not parsable, return a 400
 	var mappoolerDto models.MappoolerDto
-	if err := ctx.BodyParser(&mappoolerDto); err != nil {
-		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Bad request"})
+	if err := c.BodyParser(&mappoolerDto); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Bad request"})
 	}
 
+	token := c.Get("Authorization")
 	// call the service to add the mappooler
 	err := tournamentservice.AddMappooler(token[7:], mappoolerDto.TournamentID, mappoolerDto.UserID)
 
 	// if the service returns an error, return a 400
 	if err != nil {
-		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
 	// return a 200
-	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{"message": "Mappooler added"})
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"message": "Mappooler added"})
+}
+
+func RemoveMappooler(c *fiber.Ctx) error {
+	// bodyparse the MappoolerDto
+	// if the body is not parsable, return a 400
+	var mappoolerDto models.MappoolerDto
+	if err := c.BodyParser(&mappoolerDto); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Bad request"})
+	}
+
+	token := c.Get("Authorization")
+	// call the service to remove the mappooler
+	err := tournamentservice.RemoveMappooler(token, mappoolerDto.TournamentID, mappoolerDto.UserID)
+
+	// if the service returns an error, return a 400
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	// return a 200
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"message": "Mappooler removed"})
 }

@@ -43,3 +43,43 @@ func AddMappooler(auth_token string, tournamentID uint, userID uint) error {
 	_, err = UpdateTournament(tourneyDto)
 	return err
 }
+
+func RemoveMappooler(auth_token string, tournamentID uint, userID uint) error {
+	self, err := userservice.GetUserFromToken(auth_token)
+	if err != nil {
+		return err
+	}
+
+	tourney, err := GetTournament(tournamentID, DepthPoolers|DepthBasic)
+	if err != nil {
+		return err
+	}
+
+	// check if we are the owner and can actually add poolers
+	if self.ID != tourney.Owner.ID {
+		return errors.New("you are not the owner of this tournament")
+	}
+
+	// find the user in the poolers
+	poolerIndex := -1
+	for i, pooler := range tourney.Poolers {
+		if pooler.ID == userID {
+			poolerIndex = i
+			break
+		}
+	}
+
+	// if the user is not a pooler, return pre-emptively
+	if poolerIndex == -1 {
+		return errors.New("user is not a pooler")
+	}
+
+	tourney.Poolers = append(tourney.Poolers[:poolerIndex], tourney.Poolers[poolerIndex+1:]...)
+
+	tourneyDto := models.TournamentDto{}
+	tourneyDto.ID = tourney.ID
+	tourneyDto.Poolers = models.UserDtoListFromEntityList(tourney.Poolers)
+
+	_, err = UpdateTournament(tourneyDto)
+	return err
+}

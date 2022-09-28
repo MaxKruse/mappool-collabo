@@ -34,16 +34,7 @@ func Get(ctx *fiber.Ctx) error {
 }
 
 func GetSelf(ctx *fiber.Ctx) error {
-	// get Authorization Bearer token from header
 	token := ctx.Get("Authorization")
-	if token == "" {
-		return ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"error": "no token provided",
-		})
-	}
-
-	// strip the "Bearer" part
-	token = token[7:]
 
 	// get user from token
 	user, err := userservice.GetUserFromToken(token)

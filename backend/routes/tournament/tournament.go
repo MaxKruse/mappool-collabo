@@ -56,7 +56,8 @@ func Get(c *fiber.Ctx) error {
 
 func Create(c *fiber.Ctx) error {
 	// get self from context
-	self, err := userservice.GetUserFromToken(c.Get("Authorization")[7:])
+	token := c.Get("Authorization")
+	self, err := userservice.GetUserFromToken(token)
 	if err != nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
 	}
@@ -81,7 +82,8 @@ func Create(c *fiber.Ctx) error {
 
 func Update(c *fiber.Ctx) error {
 	// get self from context
-	self, err := userservice.GetUserFromToken(c.Get("Authorization")[7:])
+	token := c.Get("Authorization")
+	self, err := userservice.GetUserFromToken(token)
 	if err != nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
 	}
@@ -118,7 +120,8 @@ func Update(c *fiber.Ctx) error {
 
 func Delete(c *fiber.Ctx) error {
 	// get self from context
-	self, err := userservice.GetUserFromToken(c.Get("Authorization")[7:])
+	token := c.Get("Authorization")
+	self, err := userservice.GetUserFromToken(token)
 	if err != nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
 	}
