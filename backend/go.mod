@@ -8,7 +8,13 @@ require (
 	golang.org/x/oauth2 v0.0.0-20220909003341-f21342109be1
 )
 
-require github.com/davecgh/go-spew v1.1.1 // indirect
+require (
+	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/deissh/osu-go-client v1.1.3 // indirect
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
+	github.com/pkg/errors v0.9.1 // indirect
+	gopkg.in/h2non/gentleman.v2 v2.0.3 // indirect
+)
 
 require (
 	github.com/golang/protobuf v1.5.2 // indirect
