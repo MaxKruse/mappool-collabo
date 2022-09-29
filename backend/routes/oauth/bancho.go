@@ -26,7 +26,7 @@ var (
 			AuthStyle: oauth2.AuthStyleAutoDetect,
 		},
 		RedirectURL: util.Config.BanchoOauthRedirectURL,
-		Scopes:      []string{""},
+		Scopes:      []string{"public", "identify"},
 	}
 )
 
