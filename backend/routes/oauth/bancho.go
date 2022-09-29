@@ -112,8 +112,10 @@ func saveUser(user models.BanchoUserResponse, sessionToken string, oauthToken *o
 		db.Create(&newUser)
 	}
 
+	bearer := "Bearer " + sessionToken
+
 	// find the user for the session we just saved
-	savedUser, err := userservice.GetUserFromToken(sessionToken)
+	savedUser, err := userservice.GetUserFromToken(bearer)
 	if err != nil {
 		return err
 	}
