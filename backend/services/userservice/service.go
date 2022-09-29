@@ -29,7 +29,7 @@ func GetUserFromToken(token string) (entities.User, error) {
 	}
 
 	user := entities.User{}
-	err = dbSession.Find(&user, "id = ?", authToken.UserId).Error
+	err = dbSession.Preload("Token").Find(&user, "id = ?", authToken.UserId).Error
 
 	return user, err
 }
