@@ -41,4 +41,9 @@ func AddRoutes(app *fiber.App) {
 		testplayerGroup.Post("/", tournament.AddTestplayer)
 		testplayerGroup.Delete("/", tournament.RemoveTestplayer)
 	}
+
+	rounds := app.Group("/rounds")
+	{
+		rounds.Post("/", tournament.CreateRound)
+	}
 }

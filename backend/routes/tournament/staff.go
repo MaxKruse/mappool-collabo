@@ -17,7 +17,7 @@ func AddMappooler(c *fiber.Ctx) error {
 
 	token := c.Get("Authorization")
 	// call the service to add the mappooler
-	err := tournamentservice.AddMappooler(token[7:], mappoolerDto.TournamentID, mappoolerDto.UserID)
+	err := tournamentservice.AddMappooler(token, mappoolerDto.TournamentID, mappoolerDto.UserID)
 
 	// if the service returns an error, return a 400
 	if err != nil {

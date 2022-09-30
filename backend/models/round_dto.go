@@ -3,10 +3,11 @@ package models
 import "backend/models/entities"
 
 type RoundDto struct {
-	ID          uint            `json:"id"`
-	Name        string          `json:"name"`
-	Mappool     []MapDto        `json:"mappool,omitempty"`
-	Suggestions []SuggestionDto `json:"suggestions,omitempty"`
+	ID           uint            `json:"id"`
+	Name         string          `json:"name"`
+	TournamentID uint            `json:"tournament_id,omitempty"`
+	Mappool      []MapDto        `json:"mappool,omitempty"`
+	Suggestions  []SuggestionDto `json:"suggestions,omitempty"`
 }
 
 func RoundDtoFromEntity(round entities.Round) RoundDto {

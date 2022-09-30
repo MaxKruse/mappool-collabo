@@ -29,7 +29,7 @@ func Get(c *fiber.Ctx) error {
 	if token == "" {
 		self = entities.User{}
 	} else {
-		self, _ = userservice.GetUserFromToken(token[7:])
+		self, _ = userservice.GetUserFromToken(token)
 	}
 
 	tournamentEntity, err := tournamentservice.GetTournament(id, tournamentservice.DepthBasic)
