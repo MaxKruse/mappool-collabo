@@ -5,8 +5,7 @@
 - [x] osu bancho login
 - [x] create tournament
 - [ ] create mappool
-- [ ] permissions (groups)
-- [ ] invites
+- [x] permissions (groups)
 - [x] suggestions to mappool
 - [x] feedback for maps
 - [x] voting for maps
