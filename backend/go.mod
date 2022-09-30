@@ -9,6 +9,11 @@ require (
 )
 
 require (
+	github.com/Code-Hex/go-generics-cache v1.2.0 // indirect
+	golang.org/x/exp v0.0.0-20220328175248-053ad81199eb // indirect
+)
+
+require (
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/uuid v1.3.0
 	github.com/mattn/go-sqlite3 v1.14.15 // indirect

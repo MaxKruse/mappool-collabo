@@ -80,6 +80,7 @@ func RemoveMappooler(auth_token string, tournamentID uint, userID uint) error {
 
 	dbSession := database.GetDBSession()
 	err = dbSession.Model(&tourney).Association("Poolers").Delete(&pooler)
+
 	return err
 }
 

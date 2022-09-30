@@ -5,6 +5,10 @@ import (
 	"backend/models/entities"
 	"backend/services/database"
 	"backend/services/userservice"
+	"fmt"
+	"strings"
+
+	"github.com/Code-Hex/go-generics-cache/policy/lfu"
 
 	"gorm.io/gorm"
 )
@@ -22,6 +26,14 @@ const (
 	DepthAll         = DepthOwner | DepthPoolers | DepthTestplayers | DepthRounds | DepthMappool | DepthSuggestions | DepthMaps
 	DepthBasic       = DepthOwner | DepthPoolers | DepthTestplayers
 )
+
+var (
+	tournamentCache *lfu.Cache[string, entities.Tournament]
+)
+
+func init() {
+	tournamentCache = lfu.NewCache[string, entities.Tournament](lfu.WithCapacity(50))
+}
 
 func preloadFromDepth(db *gorm.DB, depth int) *gorm.DB {
 	preloads := db
@@ -64,12 +76,23 @@ func preloadFromDepth(db *gorm.DB, depth int) *gorm.DB {
 }
 
 func GetTournament[k comparable](id k, depth int) (entities.Tournament, error) {
+	// if we have it in cache, return directly
+	if val, ok := tournamentCache.Get(fmt.Sprintf("%v-%d", id, depth)); ok {
+		return val, nil
+	}
+
 	dbSession := database.GetDBSession()
 	var tournament entities.Tournament
 
 	preloads := preloadFromDepth(dbSession, depth)
 
 	err := preloads.First(&tournament, id).Error
+	if err != nil {
+		return entities.Tournament{}, err
+	}
+
+	tournamentCache.Set(fmt.Sprintf("%v-%d", id, depth), tournament)
+
 	return tournament, err
 }
 
@@ -144,6 +167,9 @@ func UpdateTournament(tournament models.TournamentDto) (entities.Tournament, err
 		return entities.Tournament{}, err
 	}
 
+	// invalidate cache where the tournamentId is in the key
+	deleteFromTournamentCache(tournament.ID)
+
 	return res, nil
 }
 
@@ -151,5 +177,14 @@ func DeleteTournament[k comparable](id k) error {
 	dbSession := database.GetDBSession()
 	var tournament entities.Tournament
 	err := dbSession.Delete(&tournament, id).Error
+	deleteFromTournamentCache(id)
 	return err
+}
+
+func deleteFromTournamentCache[k comparable](tournamentId k) {
+	for _, key := range tournamentCache.Keys() {
+		if strings.Contains(key, fmt.Sprintf("%v", tournamentId)) {
+			tournamentCache.Delete(key)
+		}
+	}
 }
