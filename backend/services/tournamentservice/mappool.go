@@ -6,7 +6,9 @@ import (
 	"backend/services/database"
 	"backend/services/osuapiservice"
 	"backend/services/userservice"
+	"backend/util/modenum"
 	"errors"
+	"math"
 	"strconv"
 
 	"gorm.io/gorm"
@@ -97,8 +99,7 @@ func AddSuggestion(token string, suggestionsDto models.SuggestionDto, roundId st
 	}
 
 	// first, get the beatmap data from the osuapiservice
-	// TODO
-	_, err = osuapiservice.NewClient(token)
+	apiclient, err := osuapiservice.NewClient(token)
 	if err != nil {
 		return entities.Suggestion{}, err
 	}
@@ -115,13 +116,27 @@ func AddSuggestion(token string, suggestionsDto models.SuggestionDto, roundId st
 		return entities.Suggestion{}, errors.New("invalid slot index")
 	}
 
-	// TODO: Actually fill the beatmap data from the osuapiservice
+	modStrings := []string{slotName}
+
+	beatmapRes, err := apiclient.GetBeatmap(suggestionsDto.Map.ID)
+	if err != nil {
+		return entities.Suggestion{}, err
+	}
+	beatmapAttribsRes, err := apiclient.GetBeatmapWithMods(suggestionsDto.Map.ID, "osu", modenum.ModStringsToInt64(modStrings))
+	if err != nil {
+		return entities.Suggestion{}, err
+	}
+
+	// format the name of the map
+	// Artist - Song [Difficulty]
+	beatmapName := beatmapRes.Beatmapset.Artist + " - " + beatmapRes.Beatmapset.Title + " [" + beatmapRes.Version + "]"
+
 	mapEntity := entities.Map{
 		Model: gorm.Model{
-			ID: 696969,
+			ID: uint(beatmapRes.ID),
 		},
-		Name: "todo",
-		Link: "todo",
+		Name: beatmapName,
+		Link: beatmapRes.URL,
 		PlaySlot: entities.Slot{
 			Name:  slotName,
 			Index: slotNumber,
@@ -129,12 +144,13 @@ func AddSuggestion(token string, suggestionsDto models.SuggestionDto, roundId st
 		Description: suggestionsDto.Comment,
 		RoundId:     round.ID,
 		Difficulty: entities.DifficultyAttributes{
-			HP:      5,
-			OD:      5,
-			AR:      5,
-			CS:      5,
-			Stars:   6.9,
-			ModInts: 72,
+			AR:         beatmapAttribsRes.Attributes.ApproachRate,
+			OD:         beatmapAttribsRes.Attributes.OverallDifficulty,
+			CS:         convertCS(beatmapRes.Cs, modenum.ModStringsToInt64(modStrings)),
+			HP:         convertDrain(beatmapRes.Drain, modenum.ModStringsToInt64(modStrings)),
+			Stars:      beatmapAttribsRes.Attributes.StarRating,
+			ModStrings: modStrings,
+			ModInts:    modenum.ModStringsToInt64(modStrings),
 		},
 	}
 
@@ -154,6 +170,48 @@ func AddSuggestion(token string, suggestionsDto models.SuggestionDto, roundId st
 	}
 
 	return suggestion, nil
+}
+
+func convertDrain(drain float64, mods int64) float64 {
+	// easy halves it
+	if mods&modenum.Easy != 0 && drain > 0 {
+		drain /= 2
+	}
+
+	// hardrock multiplies by 1.4, with 10.0 clamp
+	if mods&modenum.HardRock != 0 {
+		drain *= 1.4
+		if drain > 10.0 {
+			drain = 10.0
+		}
+	}
+
+	// Doubletime increases it by 50% (artifically, still want to display this)
+	if mods&modenum.DoubleTime != 0 {
+		drain *= 1.5
+	}
+
+	// Halftime decreases it by 25%
+	if mods&modenum.HalfTime != 0 {
+		drain *= 0.75
+	}
+
+	return drain
+}
+
+func convertCS(cs float64, modInts int64) float64 {
+	if modInts&modenum.HardRock > 0 {
+		// Multiply by 1.3, but clamp to 10.0
+		cs = math.Min(cs*1.3, 10.0)
+	}
+
+	// prevent divide by zero
+	if modInts&modenum.Easy > 0 && cs > 0 {
+		// Divide by 2
+		cs = cs / 2
+	}
+
+	return cs
 }
 
 func GetRound(roundId string, depth int) (entities.Round, error) {
