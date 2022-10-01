@@ -3,21 +3,17 @@ module backend
 go 1.19
 
 require (
+	github.com/Code-Hex/go-generics-cache v1.2.0
 	github.com/gofiber/fiber/v2 v2.38.1
 	github.com/joho/godotenv v1.4.0
 	golang.org/x/oauth2 v0.0.0-20220909003341-f21342109be1
 )
 
 require (
-	github.com/Code-Hex/go-generics-cache v1.2.0 // indirect
-	golang.org/x/exp v0.0.0-20220328175248-053ad81199eb // indirect
-)
-
-require (
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/uuid v1.3.0
 	github.com/mattn/go-sqlite3 v1.14.15 // indirect
-	golang.org/x/net v0.0.0-20220927171203-f486391704dc // indirect
+	golang.org/x/net v0.0.0-20220930213112-107f3e3c3b0b // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 )
