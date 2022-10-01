@@ -24,6 +24,7 @@ type DifficultyAttributes struct {
 	AR         float64
 	CS         float64
 	Stars      float64
+	Length     float64
 	ModStrings []string `gorm:"type:text[]"`
 	ModInts    int64
 	MapId      uint

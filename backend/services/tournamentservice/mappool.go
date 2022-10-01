@@ -148,6 +148,7 @@ func AddSuggestion(token string, suggestionsDto models.SuggestionDto, roundId st
 			OD:         beatmapAttribsRes.Attributes.OverallDifficulty,
 			CS:         convertCS(beatmapRes.Cs, modenum.ModStringsToInt64(modStrings)),
 			HP:         convertDrain(beatmapRes.Drain, modenum.ModStringsToInt64(modStrings)),
+			Length:     float64(beatmapRes.TotalLength),
 			Stars:      beatmapAttribsRes.Attributes.StarRating,
 			ModStrings: modStrings,
 			ModInts:    modenum.ModStringsToInt64(modStrings),
