@@ -9,6 +9,8 @@ require (
 	golang.org/x/oauth2 v0.0.0-20220909003341-f21342109be1
 )
 
+require github.com/maxkruse/gosu-api-client v0.0.0-20221001193632-5b1bdc9d669e // indirect
+
 require (
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/uuid v1.3.0
