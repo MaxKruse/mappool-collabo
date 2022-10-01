@@ -24,8 +24,9 @@ type DifficultyAttributes struct {
 	AR         float64
 	CS         float64
 	Stars      float64
-	ModStrings []string
+	ModStrings []string `gorm:"type:text[]"`
 	ModInts    int64
+	MapId      uint
 }
 
 func (m Map) SlotName() string {

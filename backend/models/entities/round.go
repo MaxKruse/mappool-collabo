@@ -6,8 +6,8 @@ import (
 
 type Round struct {
 	gorm.Model
-	Name         string `gorm:"index:test,unique"`
-	TournamentId uint   `gorm:"index:test,unique"`
+	Name         string `gorm:"index:round_tournament,unique"`
+	TournamentId uint   `gorm:"index:round_tournament,unique"`
 	Mappool      []Map
 	Suggestions  []Suggestion
 }

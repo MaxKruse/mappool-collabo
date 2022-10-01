@@ -111,16 +111,16 @@ func init() {
 	}
 
 	// migrate tables
-	db.AutoMigrate(&entities.Session{})
 	db.AutoMigrate(&entities.User{})
-	db.AutoMigrate(&entities.Slot{})
+	db.AutoMigrate(&entities.Session{})
+	db.AutoMigrate(&entities.Token{})
 	db.AutoMigrate(&entities.Tournament{})
 	db.AutoMigrate(&entities.Round{})
 	db.AutoMigrate(&entities.Map{})
+	db.AutoMigrate(&entities.DifficultyAttributes{})
 	db.AutoMigrate(&entities.Suggestion{})
 	db.AutoMigrate(&entities.Vote{})
-	db.AutoMigrate(&entities.Token{})
-	db.AutoMigrate(&entities.DifficultyAttributes{})
+	db.AutoMigrate(&entities.Slot{})
 
 	// check if we are using in-memory database
 	if isDevelopment() {
