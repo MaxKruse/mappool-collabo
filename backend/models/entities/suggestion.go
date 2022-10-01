@@ -6,6 +6,7 @@ import (
 
 type Suggestion struct {
 	gorm.Model
+	Round    Round
 	RoundId  uint
 	Author   User
 	AuthorId uint

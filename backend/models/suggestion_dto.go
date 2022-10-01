@@ -8,6 +8,7 @@ type SuggestionDto struct {
 	Map       MapDto    `json:"map"`
 	Votes     []VoteDto `json:"votes,omitempty"`
 	VoteScore int       `json:"voteScore"`
+	Round     RoundDto  `json:"round"`
 }
 
 func SuggestionDtoFromEntity(suggestion entities.Suggestion) SuggestionDto {
@@ -22,6 +23,7 @@ func SuggestionDtoFromEntity(suggestion entities.Suggestion) SuggestionDto {
 		Map:       MapDtoFromEntity(suggestion.Map),
 		Votes:     VoteDtoListFromEntityList(suggestion.Votes),
 		VoteScore: votes,
+		Round:     RoundDtoFromEntity(suggestion.Round),
 	}
 }
 

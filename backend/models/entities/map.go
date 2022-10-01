@@ -12,9 +12,20 @@ type Map struct {
 	Link        string
 	PlaySlot    Slot
 	Description string
-	Suggestions []Suggestion
 	Round       Round
 	RoundId     uint
+	Difficulty  DifficultyAttributes
+}
+
+type DifficultyAttributes struct {
+	gorm.Model
+	HP         float64
+	OD         float64
+	AR         float64
+	CS         float64
+	Stars      float64
+	ModStrings []string
+	ModInts    int64
 }
 
 func (m Map) SlotName() string {
