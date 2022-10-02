@@ -138,30 +138,38 @@ func AddSuggestion(token string, suggestionDto models.SuggestionDto, roundId str
 			Name:  suggestionDto.Map.Slot.Name,
 			Index: suggestionDto.Map.Slot.Index,
 		},
-		Description: suggestionDto.Comment,
-		RoundId:     round.ID,
+		Description: suggestionDto.Map.Description,
 		Difficulty: entities.DifficultyAttributes{
-			AR:         beatmapAttribsRes.Attributes.ApproachRate,
-			OD:         beatmapAttribsRes.Attributes.OverallDifficulty,
-			CS:         convertCS(beatmapRes.Cs, modenum.ModStringsToInt64(modStrings)),
-			HP:         convertDrain(beatmapRes.Drain, modenum.ModStringsToInt64(modStrings)),
-			Length:     float64(beatmapRes.TotalLength),
-			Stars:      beatmapAttribsRes.Attributes.StarRating,
-			ModStrings: modStrings,
-			ModInts:    modenum.ModStringsToInt64(modStrings),
+			AR:      beatmapAttribsRes.Attributes.ApproachRate,
+			OD:      beatmapAttribsRes.Attributes.OverallDifficulty,
+			CS:      convertCS(beatmapRes.Cs, modenum.ModStringsToInt64(modStrings)),
+			HP:      convertDrain(beatmapRes.Drain, modenum.ModStringsToInt64(modStrings)),
+			Length:  float64(beatmapRes.TotalLength),
+			Stars:   beatmapAttribsRes.Attributes.StarRating,
+			ModInts: modenum.ModStringsToInt64(modStrings),
 		},
 	}
 
 	// create the suggestion
 	suggestion := entities.Suggestion{
-		Map:    mapEntity,
-		Round:  round,
-		Author: user,
+		Map:     mapEntity,
+		Round:   round,
+		Author:  user,
+		Comment: suggestionDto.Comment,
 	}
 
 	// add the suggestion to the database
 	dbSession := database.GetDBSession()
 	err = dbSession.Create(&suggestion).Error
+
+	if err != nil {
+		return entities.Suggestion{}, err
+	}
+
+	// add the suggestion to the round
+	round.Suggestions = append(round.Suggestions, suggestion)
+	// save the round
+	err = dbSession.Save(&round).Error
 
 	if err != nil {
 		return entities.Suggestion{}, err

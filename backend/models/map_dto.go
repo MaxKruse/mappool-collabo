@@ -11,20 +11,20 @@ type SlotDto struct {
 }
 
 type MapDto struct {
-	ID          uint    `json:"id"`
-	Name        string  `json:"name"`
-	Slot        SlotDto `json:"slot"`
-	Description string  `json:"description"`
+	ID          uint    `json:"id,omitempty"`
+	Name        string  `json:"name,omitempty"`
+	Slot        SlotDto `json:"slot,omitempty"`
+	Description string  `json:"description,omitempty"`
 }
 
 type DifficultyAttributeDto struct {
-	HP         float64  `json:"hp"`
-	OD         float64  `json:"od"`
-	AR         float64  `json:"ar"`
-	CS         float64  `json:"cs"`
-	Stars      float64  `json:"stars"`
-	ModStrings []string `json:"modStrings"`
-	ModInts    int64    `json:"modInts"`
+	HP         float64  `json:"hp,omitempty"`
+	OD         float64  `json:"od,omitempty"`
+	AR         float64  `json:"ar,omitempty"`
+	CS         float64  `json:"cs,omitempty"`
+	Stars      float64  `json:"stars,omitempty"`
+	ModStrings []string `json:"modStrings,omitempty"`
+	ModInts    int64    `json:"modInts,omitempty"`
 }
 
 func MapDtoFromEntity(mapEntity entities.Map) MapDto {
@@ -58,9 +58,6 @@ func DifficultyAttributeDtoFromEntity(difficultyAttributeEntity entities.Difficu
 	if difficultyAttributeEntity.ModInts != 0 {
 		modInts = difficultyAttributeEntity.ModInts
 		modStrings = modenum.ModIntsToStringArray(modInts)
-	} else if len(difficultyAttributeEntity.ModStrings) != 0 {
-		modStrings = difficultyAttributeEntity.ModStrings
-		modInts = modenum.ModStringsToInt64(modStrings)
 	}
 
 	return DifficultyAttributeDto{

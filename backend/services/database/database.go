@@ -51,7 +51,6 @@ func populateDummyData() {
 		Name:        "40mp feat.yuikonnu - Ame to Asphalt",
 		Link:        "https://osu.ppy.sh/beatmapsets/709244#osu/1499305",
 		Description: "This is a test map",
-		RoundId:     roundEntity.ID,
 		PlaySlot: entities.Slot{
 			Name:  "NM",
 			Index: 1,

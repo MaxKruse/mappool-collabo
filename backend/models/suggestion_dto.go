@@ -4,11 +4,11 @@ import "backend/models/entities"
 
 type SuggestionDto struct {
 	ID        uint      `json:"id"`
-	Comment   string    `json:"comment"`
-	Map       MapDto    `json:"map"`
+	Comment   string    `json:"comment,omitempty"`
+	Map       MapDto    `json:"map,omitempty"`
 	Votes     []VoteDto `json:"votes,omitempty"`
 	VoteScore int       `json:"voteScore"`
-	Round     RoundDto  `json:"round"`
+	Round     *RoundDto `json:"round,omitempty"`
 }
 
 func SuggestionDtoFromEntity(suggestion entities.Suggestion) SuggestionDto {
@@ -23,7 +23,6 @@ func SuggestionDtoFromEntity(suggestion entities.Suggestion) SuggestionDto {
 		Map:       MapDtoFromEntity(suggestion.Map),
 		Votes:     VoteDtoListFromEntityList(suggestion.Votes),
 		VoteScore: votes,
-		Round:     RoundDtoFromEntity(suggestion.Round),
 	}
 }
 

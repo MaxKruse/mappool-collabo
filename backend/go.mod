@@ -8,13 +8,18 @@ require (
 	golang.org/x/oauth2 v0.0.0-20220909003341-f21342109be1
 )
 
-require github.com/maxkruse/gosu-api-client v0.0.0-20221001193632-5b1bdc9d669e
+require github.com/maxkruse/gosu-api-client v0.1.0
+
+require (
+	github.com/andres-erbsen/clock v0.0.0-20160526145045-9e14626cd129 // indirect
+	go.uber.org/ratelimit v0.2.0 // indirect
+)
 
 require (
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/uuid v1.3.0
 	github.com/mattn/go-sqlite3 v1.14.15 // indirect
-	golang.org/x/net v0.0.0-20220930213112-107f3e3c3b0b // indirect
+	golang.org/x/net v0.0.0-20221002022538-bcab6841153b // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 )
