@@ -11,10 +11,11 @@ type SlotDto struct {
 }
 
 type MapDto struct {
-	ID          uint    `json:"id,omitempty"`
-	Name        string  `json:"name,omitempty"`
-	Slot        SlotDto `json:"slot,omitempty"`
-	Description string  `json:"description,omitempty"`
+	ID                   uint                    `json:"id,omitempty"`
+	Name                 string                  `json:"name,omitempty"`
+	Slot                 SlotDto                 `json:"slot,omitempty"`
+	Description          string                  `json:"description,omitempty"`
+	DifficultyAttributes *DifficultyAttributeDto `json:"difficultyAttributes,omitempty"`
 }
 
 type DifficultyAttributeDto struct {
@@ -33,6 +34,15 @@ func MapDtoFromEntity(mapEntity entities.Map) MapDto {
 		Name:        mapEntity.Name,
 		Slot:        SlotDtoFromEntity(mapEntity.PlaySlot),
 		Description: mapEntity.Description,
+		DifficultyAttributes: &DifficultyAttributeDto{
+			HP:         mapEntity.Difficulty.HP,
+			OD:         mapEntity.Difficulty.OD,
+			AR:         mapEntity.Difficulty.AR,
+			CS:         mapEntity.Difficulty.CS,
+			Stars:      mapEntity.Difficulty.Stars,
+			ModStrings: modenum.ModIntsToStringArray(mapEntity.Difficulty.ModInts),
+			ModInts:    mapEntity.Difficulty.ModInts,
+		},
 	}
 }
 
