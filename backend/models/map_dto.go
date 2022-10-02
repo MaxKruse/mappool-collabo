@@ -5,11 +5,16 @@ import (
 	"backend/util/modenum"
 )
 
+type SlotDto struct {
+	Name  string `json:"name"`
+	Index int    `json:"index"`
+}
+
 type MapDto struct {
-	ID          uint   `json:"id"`
-	Name        string `json:"name"`
-	Slot        string `json:"slot"`
-	Description string `json:"description"`
+	ID          uint    `json:"id"`
+	Name        string  `json:"name"`
+	Slot        SlotDto `json:"slot"`
+	Description string  `json:"description"`
 }
 
 type DifficultyAttributeDto struct {
@@ -26,8 +31,15 @@ func MapDtoFromEntity(mapEntity entities.Map) MapDto {
 	return MapDto{
 		ID:          mapEntity.ID,
 		Name:        mapEntity.Name,
-		Slot:        mapEntity.SlotName(),
+		Slot:        SlotDtoFromEntity(mapEntity.PlaySlot),
 		Description: mapEntity.Description,
+	}
+}
+
+func SlotDtoFromEntity(slotEntity entities.Slot) SlotDto {
+	return SlotDto{
+		Name:  slotEntity.Name,
+		Index: slotEntity.Index,
 	}
 }
 

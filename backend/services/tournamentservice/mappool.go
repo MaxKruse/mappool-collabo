@@ -9,7 +9,6 @@ import (
 	"backend/util/modenum"
 	"errors"
 	"math"
-	"strconv"
 
 	"gorm.io/gorm"
 )
@@ -62,7 +61,7 @@ func AddRound(token string, roundDto models.RoundDto) (entities.Round, error) {
 	return round, nil
 }
 
-func AddSuggestion(token string, suggestionsDto models.SuggestionDto, roundId string) (entities.Suggestion, error) {
+func AddSuggestion(token string, suggestionDto models.SuggestionDto, roundId string) (entities.Suggestion, error) {
 	// get the user from the token
 	user, err := userservice.GetUserFromToken(token)
 	if err != nil {
@@ -104,25 +103,23 @@ func AddSuggestion(token string, suggestionsDto models.SuggestionDto, roundId st
 		return entities.Suggestion{}, err
 	}
 
-	// parse the suggestionsDto.Map.Slot. Format should be "NM1", "HD2", "HR3", "DT4", "FM5" etc.
+	// parse the suggestionDto.Map.Slot. Format should be "NM1", "HD2", "HR3", "DT4", "FM5" etc.
 
-	if len(suggestionsDto.Map.Slot) < 3 {
-		return entities.Suggestion{}, errors.New("invalid slot")
+	if len(suggestionDto.Map.Slot.Name) < 2 {
+		return entities.Suggestion{}, errors.New("invalid slot name")
 	}
 
-	slotName := suggestionsDto.Map.Slot[:2]
-	slotNumber, err := strconv.Atoi(suggestionsDto.Map.Slot[2:])
-	if err != nil {
+	if suggestionDto.Map.Slot.Index == 0 {
 		return entities.Suggestion{}, errors.New("invalid slot index")
 	}
 
-	modStrings := []string{slotName}
+	modStrings := []string{suggestionDto.Map.Slot.Name}
 
-	beatmapRes, err := apiclient.GetBeatmap(suggestionsDto.Map.ID)
+	beatmapRes, err := apiclient.GetBeatmap(suggestionDto.Map.ID)
 	if err != nil {
 		return entities.Suggestion{}, err
 	}
-	beatmapAttribsRes, err := apiclient.GetBeatmapWithMods(suggestionsDto.Map.ID, "osu", modenum.ModStringsToInt64(modStrings))
+	beatmapAttribsRes, err := apiclient.GetBeatmapWithMods(suggestionDto.Map.ID, "osu", modenum.ModStringsToInt64(modStrings))
 	if err != nil {
 		return entities.Suggestion{}, err
 	}
@@ -138,10 +135,10 @@ func AddSuggestion(token string, suggestionsDto models.SuggestionDto, roundId st
 		Name: beatmapName,
 		Link: beatmapRes.URL,
 		PlaySlot: entities.Slot{
-			Name:  slotName,
-			Index: slotNumber,
+			Name:  suggestionDto.Map.Slot.Name,
+			Index: suggestionDto.Map.Slot.Index,
 		},
-		Description: suggestionsDto.Comment,
+		Description: suggestionDto.Comment,
 		RoundId:     round.ID,
 		Difficulty: entities.DifficultyAttributes{
 			AR:         beatmapAttribsRes.Attributes.ApproachRate,
