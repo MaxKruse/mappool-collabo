@@ -4,16 +4,7 @@ import (
 	"backend/models/entities"
 	"backend/services/database"
 	"errors"
-	"fmt"
-
-	"github.com/Code-Hex/go-generics-cache/policy/lru"
 )
-
-var userCache *lru.Cache[string, entities.User]
-
-func init() {
-	userCache = lru.NewCache[string, entities.User](lru.WithCapacity(100))
-}
 
 func GetUserFromToken(token string) (entities.User, error) {
 	dbSession := database.GetDBSession()
@@ -41,21 +32,14 @@ func GetUserFromToken(token string) (entities.User, error) {
 }
 
 func GetUserFromId[k comparable](id k) (entities.User, error) {
-
-	if user, ok := userCache.Get(fmt.Sprintf("%v", id)); ok {
-		return user, nil
-	}
-
 	dbSession := database.GetDBSession()
 
 	res := entities.User{}
-	err := dbSession.Find(&res, "id = ?", id).Error
+	err := dbSession.Preload("Token").Find(&res, "id = ?", id).Error
 
 	if err != nil {
 		return entities.User{}, err
 	}
-
-	userCache.Set(fmt.Sprintf("%v", id), res)
 
 	return res, err
 }

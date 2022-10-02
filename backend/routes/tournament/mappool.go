@@ -43,9 +43,9 @@ func AddSuggestion(c *fiber.Ctx) error {
 	// call the service to remove the testplayer
 	suggestion, err := tournamentservice.AddSuggestion(token, suggestionDto, roundId)
 
-	// if the service returns an error, return a 400
+	// if the service returns an error, return a 500
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
 
 	// return the suggestion

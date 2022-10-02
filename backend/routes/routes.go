@@ -45,5 +45,6 @@ func AddRoutes(app *fiber.App) {
 	rounds := app.Group("/rounds")
 	{
 		rounds.Post("/", tournament.CreateRound)
+		rounds.Post("/:id/suggest", tournament.AddSuggestion)
 	}
 }

@@ -3,13 +3,12 @@ module backend
 go 1.19
 
 require (
-	github.com/Code-Hex/go-generics-cache v1.2.0
 	github.com/gofiber/fiber/v2 v2.38.1
 	github.com/joho/godotenv v1.4.0
 	golang.org/x/oauth2 v0.0.0-20220909003341-f21342109be1
 )
 
-require github.com/maxkruse/gosu-api-client v0.0.0-20221001193632-5b1bdc9d669e // indirect
+require github.com/maxkruse/gosu-api-client v0.0.0-20221001193632-5b1bdc9d669e
 
 require (
 	github.com/golang/protobuf v1.5.2 // indirect
