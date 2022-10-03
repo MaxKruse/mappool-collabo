@@ -7,11 +7,11 @@ import (
 type Suggestion struct {
 	gorm.Model
 	Round    Round
-	RoundId  uint `gorm:"index:round_suggestion,unique"`
+	RoundId  uint
 	Author   User
 	AuthorId uint
 	Map      Map
-	MapId    uint `gorm:"index:round_suggestion,unique"`
+	MapId    uint
 	Comment  string
 	Votes    []Vote
 }

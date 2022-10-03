@@ -9,8 +9,6 @@ import (
 	"backend/util/modenum"
 	"errors"
 	"math"
-
-	"gorm.io/gorm"
 )
 
 func AddRound(token string, roundDto models.RoundDto) (entities.Round, error) {
@@ -114,40 +112,57 @@ func AddSuggestion(token string, suggestionDto models.SuggestionDto, roundId str
 	}
 
 	modStrings := []string{suggestionDto.Map.Slot.Name}
+	modInts := modenum.ModStringsToInt64(modStrings)
 
-	beatmapRes, err := apiclient.GetBeatmap(suggestionDto.Map.ID)
-	if err != nil {
-		return entities.Suggestion{}, err
+	// if we already have a map with this ID and modInts, return, dont create a new entity
+	dbSession := database.GetDBSession()
+	var mapEntity entities.Map
+
+	err = dbSession.Preload("Difficulty").Preload("PlaySlot").Where("beatmap_id = ? AND mod_ints = ?", suggestionDto.Map.ID, modInts).First(&mapEntity).Error
+
+	// if the round already has this exact map as a suggestion, return an error
+	for _, round := range tournament.Rounds {
+		for _, suggestion := range round.Suggestions {
+			if suggestion.Map.ID == mapEntity.ID && suggestion.Map.ModInts == mapEntity.ModInts {
+				return entities.Suggestion{}, errors.New("this map is already suggested for this tournament")
+			}
+		}
 	}
-	beatmapAttribsRes, err := apiclient.GetBeatmapWithMods(suggestionDto.Map.ID, "osu", modenum.ModStringsToInt64(modStrings))
+
 	if err != nil {
-		return entities.Suggestion{}, err
-	}
+		beatmapRes, err := apiclient.GetBeatmap(suggestionDto.Map.ID)
+		if err != nil {
+			return entities.Suggestion{}, err
+		}
+		beatmapAttribsRes, err := apiclient.GetBeatmapWithMods(suggestionDto.Map.ID, "osu", modInts)
+		if err != nil {
+			return entities.Suggestion{}, err
+		}
 
-	// format the name of the map
-	// Artist - Song [Difficulty]
-	beatmapName := beatmapRes.Beatmapset.Artist + " - " + beatmapRes.Beatmapset.Title + " [" + beatmapRes.Version + "]"
+		// format the name of the map
+		// Artist - Song [Difficulty]
+		beatmapName := beatmapRes.Beatmapset.Artist + " - " + beatmapRes.Beatmapset.Title + " [" + beatmapRes.Version + "]"
 
-	mapEntity := entities.Map{
-		Model: gorm.Model{
-			ID: uint(beatmapRes.ID),
-		},
-		Name: beatmapName,
-		Link: beatmapRes.URL,
-		PlaySlot: entities.Slot{
-			Name:  suggestionDto.Map.Slot.Name,
-			Index: suggestionDto.Map.Slot.Index,
-		},
-		Description: suggestionDto.Map.Description,
-		Difficulty: entities.DifficultyAttributes{
-			AR:      beatmapAttribsRes.Attributes.ApproachRate,
-			OD:      beatmapAttribsRes.Attributes.OverallDifficulty,
-			CS:      convertCS(beatmapRes.Cs, modenum.ModStringsToInt64(modStrings)),
-			HP:      convertDrain(beatmapRes.Drain, modenum.ModStringsToInt64(modStrings)),
-			Length:  float64(beatmapRes.TotalLength),
-			Stars:   beatmapAttribsRes.Attributes.StarRating,
-			ModInts: modenum.ModStringsToInt64(modStrings),
-		},
+		mapEntity = entities.Map{
+			BeatmapId: uint(beatmapRes.ID),
+			Name:      beatmapName,
+			Link:      beatmapRes.URL,
+			PlaySlot: entities.Slot{
+				Name:  suggestionDto.Map.Slot.Name,
+				Index: suggestionDto.Map.Slot.Index,
+			},
+			Description: suggestionDto.Map.Description,
+			Difficulty: entities.DifficultyAttributes{
+				AR:      beatmapAttribsRes.Attributes.ApproachRate,
+				OD:      beatmapAttribsRes.Attributes.OverallDifficulty,
+				CS:      convertCS(beatmapRes.Cs, modInts),
+				HP:      convertDrain(beatmapRes.Drain, modInts),
+				Length:  float64(beatmapRes.TotalLength),
+				Stars:   beatmapAttribsRes.Attributes.StarRating,
+				ModInts: modInts,
+			},
+		}
+
 	}
 
 	// create the suggestion
@@ -159,7 +174,6 @@ func AddSuggestion(token string, suggestionDto models.SuggestionDto, roundId str
 	}
 
 	// add the suggestion to the database
-	dbSession := database.GetDBSession()
 	err = dbSession.Create(&suggestion).Error
 
 	if err != nil {

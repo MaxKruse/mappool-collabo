@@ -8,6 +8,8 @@ import (
 
 type Map struct {
 	gorm.Model
+	BeatmapId   uint `gorm:"index:idx_map_mods,unique"`
+	ModInts     int  `gorm:"index:idx_map_mods,unique"`
 	Name        string
 	Link        string
 	PlaySlot    Slot

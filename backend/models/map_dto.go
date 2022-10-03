@@ -30,7 +30,7 @@ type DifficultyAttributeDto struct {
 
 func MapDtoFromEntity(mapEntity entities.Map) MapDto {
 	return MapDto{
-		ID:          mapEntity.ID,
+		ID:          mapEntity.BeatmapId,
 		Name:        mapEntity.Name,
 		Slot:        SlotDtoFromEntity(mapEntity.PlaySlot),
 		Description: mapEntity.Description,
