@@ -1,0 +1,206 @@
+{
+    "client": "Thunder Client",
+    "collectionName": "MappoolCollabo",
+    "dateExported": "2022-10-06T12:46:52.848Z",
+    "version": "1.1",
+    "folders": [],
+    "requests": [
+        {
+            "_id": "b58b3535-0416-47d3-bf93-882a512d00f7",
+            "colId": "9afd7ed8-2e03-4060-bb44-0e19246aaf4f",
+            "containerId": "",
+            "name": "Get All Users",
+            "url": "http://localhost:5000/users/",
+            "method": "GET",
+            "sortNum": 10000,
+            "created": "2022-10-02T21:22:16.575Z",
+            "modified": "2022-10-02T21:22:16.575Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "2f1eb115-bff6-4663-8a75-f7a995498d69",
+            "colId": "9afd7ed8-2e03-4060-bb44-0e19246aaf4f",
+            "containerId": "",
+            "name": "Get All Tournaments",
+            "url": "http://localhost:5000/tournaments/",
+            "method": "GET",
+            "sortNum": 20000,
+            "created": "2022-10-02T21:23:37.261Z",
+            "modified": "2022-10-02T21:23:46.175Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "6ec88363-a1ff-4210-990d-b9f3c45919c4",
+            "colId": "9afd7ed8-2e03-4060-bb44-0e19246aaf4f",
+            "containerId": "",
+            "name": "Get Specific Tournament",
+            "url": "http://localhost:5000/tournaments/1",
+            "method": "GET",
+            "sortNum": 30000,
+            "created": "2022-10-02T21:25:14.329Z",
+            "modified": "2022-10-02T21:25:19.912Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "496547df-14c3-42b2-b8a7-6f571475b32d",
+            "colId": "9afd7ed8-2e03-4060-bb44-0e19246aaf4f",
+            "containerId": "",
+            "name": "Add Tournament",
+            "url": "http://localhost:5000/tournaments/",
+            "method": "POST",
+            "sortNum": 40000,
+            "created": "2022-10-02T21:36:55.540Z",
+            "modified": "2022-10-02T22:06:26.965Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"name\": \"Cool name\",\n  \"description\": \"first test tourney\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "ac61ab33-db2e-4dd3-afa6-2e58c76c0766",
+            "colId": "9afd7ed8-2e03-4060-bb44-0e19246aaf4f",
+            "containerId": "",
+            "name": "Add Mappooler",
+            "url": "http://localhost:5000/mappoolers/",
+            "method": "POST",
+            "sortNum": 50000,
+            "created": "2022-10-02T22:06:50.753Z",
+            "modified": "2022-10-02T22:07:32.794Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"tournament_id\": 1,\n  \"user_id\": 1199528\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "7e2f5edc-b3b0-4f3d-b0cd-795a8f65dd76",
+            "colId": "9afd7ed8-2e03-4060-bb44-0e19246aaf4f",
+            "containerId": "",
+            "name": "Add Testplayer",
+            "url": "http://localhost:5000/testplayers/",
+            "method": "POST",
+            "sortNum": 60000,
+            "created": "2022-10-02T22:09:38.253Z",
+            "modified": "2022-10-02T22:15:24.418Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"tournament_id\": 1,\n  \"user_id\": 1199528\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "d4809956-412c-410e-bd4d-cc95ad543eb1",
+            "colId": "9afd7ed8-2e03-4060-bb44-0e19246aaf4f",
+            "containerId": "",
+            "name": "Add Round",
+            "url": "http://localhost:5000/rounds/",
+            "method": "POST",
+            "sortNum": 70000,
+            "created": "2022-10-02T22:27:18.227Z",
+            "modified": "2022-10-02T22:28:05.534Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"tournament_id\": 1,\n  \"name\": \"Round of 64\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "ce2ec8bb-876c-414a-ac2b-e06dfe76095d",
+            "colId": "9afd7ed8-2e03-4060-bb44-0e19246aaf4f",
+            "containerId": "",
+            "name": "Add Suggestion (Nomod)",
+            "url": "http://localhost:5000/rounds/1/suggest",
+            "method": "POST",
+            "sortNum": 80000,
+            "created": "2022-10-02T22:28:13.309Z",
+            "modified": "2022-10-02T22:39:02.681Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"map\": {\n    \"id\": 1754777,\n    \"description\": \"Flow Streams\",\n    \"slot\": {\n      \"name\": \"NM\",\n      \"index\": 2\n    }\n  },\n  \"comment\": \"I really like this map!\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "66618eae-c0ae-4010-bac9-cdb792fded2f",
+            "colId": "9afd7ed8-2e03-4060-bb44-0e19246aaf4f",
+            "containerId": "",
+            "name": "Add Suggestion (Nomod But with HR)",
+            "url": "http://localhost:5000/rounds/1/suggest",
+            "method": "POST",
+            "sortNum": 82500,
+            "created": "2022-10-03T11:48:36.812Z",
+            "modified": "2022-10-03T11:48:54.442Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"map\": {\n    \"id\": 1754777,\n    \"description\": \"Flow Streams\",\n    \"slot\": {\n      \"name\": \"HR\",\n      \"index\": 2\n    }\n  },\n  \"comment\": \"I really like this map!\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "5546e101-e820-47de-9ddc-5795548c97cd",
+            "colId": "9afd7ed8-2e03-4060-bb44-0e19246aaf4f",
+            "containerId": "",
+            "name": "Add Suggestion (HR)",
+            "url": "http://localhost:5000/rounds/1/suggest",
+            "method": "POST",
+            "sortNum": 85000,
+            "created": "2022-10-02T23:17:37.505Z",
+            "modified": "2022-10-02T23:18:12.383Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"map\": {\n    \"id\": 550235,\n    \"description\": \"Consistency out of my ass\",\n    \"slot\": {\n      \"name\": \"HR\",\n      \"index\": 1\n    }\n  },\n  \"comment\": \"Probably too long\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "1664684c-61a5-430d-ba31-25629a041ec0",
+            "colId": "9afd7ed8-2e03-4060-bb44-0e19246aaf4f",
+            "containerId": "",
+            "name": "Get Self",
+            "url": "http://localhost:5000/users/self",
+            "method": "GET",
+            "sortNum": 90000,
+            "created": "2022-10-02T22:34:23.694Z",
+            "modified": "2022-10-02T22:34:38.081Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        }
+    ],
+    "settings": {
+        "headers": [],
+        "auth": {
+            "type": "bearer",
+            "bearer": "8ace71db-4313-11ed-8558-963b7cd8db67"
+        },
+        "tests": []
+    }
+}
