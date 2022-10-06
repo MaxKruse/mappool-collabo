@@ -59,6 +59,53 @@ func AddRound(token string, roundDto models.RoundDto) (entities.Round, error) {
 	return round, nil
 }
 
+func RemoveRound(token string, roundId string) error {
+	// get the user from the token
+	user, err := userservice.GetUserFromToken(token)
+	if err != nil {
+		return err
+	}
+
+	// get the round from the database
+	round, err := GetRound(roundId)
+	if err != nil {
+		return err
+	}
+
+	// get the tournament of this round
+	tournament, err := GetTournament(round.TournamentId, DepthRounds|DepthPoolers)
+	if err != nil {
+		return err
+	}
+
+	// check if the user is a mappooler or the owner of the tournament
+	canEdit := false
+	for _, pooler := range tournament.Poolers {
+		if pooler.ID == user.ID {
+			canEdit = true
+			break
+		}
+	}
+	if tournament.Owner.ID == user.ID {
+		canEdit = true
+	}
+
+	// if the user is not a mappooler or the owner, return an error
+	if !canEdit {
+		return errors.New("you are not allowed to edit this tournament")
+	}
+
+	// remove the round from the database
+	dbSession := database.GetDBSession()
+	err = dbSession.Delete(&round).Error
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func AddSuggestion(token string, suggestionDto models.SuggestionDto, roundId string) (entities.Suggestion, error) {
 	// get the user from the token
 	user, err := userservice.GetUserFromToken(token)
@@ -67,7 +114,7 @@ func AddSuggestion(token string, suggestionDto models.SuggestionDto, roundId str
 	}
 
 	// get the round from the database
-	round, err := GetRound(roundId, DepthSuggestions)
+	round, err := GetRound(roundId)
 	if err != nil {
 		return entities.Suggestion{}, err
 	}
@@ -234,7 +281,7 @@ func convertCS(cs float64, modInts int64) float64 {
 	return cs
 }
 
-func GetRound(roundId string, depth int) (entities.Round, error) {
+func GetRound(roundId string) (entities.Round, error) {
 	// get the round from the database
 	dbSession := database.GetDBSession()
 	round := entities.Round{}

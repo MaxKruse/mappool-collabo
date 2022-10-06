@@ -52,3 +52,19 @@ func AddSuggestion(c *fiber.Ctx) error {
 	return c.JSON(models.SuggestionDtoFromEntity(suggestion))
 
 }
+
+func RemoveRound(c *fiber.Ctx) error {
+	roundId := c.Params("id")
+
+	token := c.Get("Authorization")
+	// call the service to remove the testplayer
+	err := tournamentservice.RemoveRound(token, roundId)
+
+	// if the service returns an error, return a 500
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	// return the suggestion
+	return c.SendStatus(fiber.StatusOK)
+}
