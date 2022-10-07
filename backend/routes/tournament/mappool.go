@@ -3,6 +3,7 @@ package tournament
 import (
 	"backend/models"
 	"backend/services/tournamentservice"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -57,14 +58,42 @@ func RemoveRound(c *fiber.Ctx) error {
 	roundId := c.Params("id")
 
 	token := c.Get("Authorization")
-	// call the service to remove the testplayer
+	// call the service to remove the round
 	err := tournamentservice.RemoveRound(token, roundId)
 
 	// if the service returns an error, return a 500
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
+	return c.SendStatus(fiber.StatusOK)
+}
 
-	// return the suggestion
+func AddVote(c *fiber.Ctx) error {
+	roundId := c.Params("id")
+	suggestionId := c.Params("suggestionId")
+	var vote models.VoteDto
+	if err := c.BodyParser(&vote); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Bad request"})
+	}
+
+	token := c.Get("Authorization")
+
+	// convert roundId and suggestionId to uint
+	roundIdUint, err := strconv.ParseUint(roundId, 10, 32)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Bad request"})
+	}
+
+	suggestionIdUint, err := strconv.ParseUint(suggestionId, 10, 32)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Bad request"})
+	}
+
+	// call the service to add the vote
+	err = tournamentservice.AddVote(token, uint(roundIdUint), uint(suggestionIdUint), vote)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+
 	return c.SendStatus(fiber.StatusOK)
 }

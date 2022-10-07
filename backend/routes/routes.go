@@ -48,4 +48,9 @@ func AddRoutes(app *fiber.App) {
 		rounds.Post("/:id/suggest", tournament.AddSuggestion)
 		rounds.Delete("/:id", tournament.RemoveRound)
 	}
+
+	votes := app.Group("/votes")
+	{
+		votes.Post("/:id/:suggestionId", tournament.AddVote)
+	}
 }

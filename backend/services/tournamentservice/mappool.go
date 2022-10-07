@@ -167,15 +167,6 @@ func AddSuggestion(token string, suggestionDto models.SuggestionDto, roundId str
 
 	err = dbSession.Preload("Difficulty").Preload("PlaySlot").Where("beatmap_id = ? AND mod_ints = ?", suggestionDto.Map.ID, modInts).First(&mapEntity).Error
 
-	// if the round already has this exact map as a suggestion, return an error
-	for _, round := range tournament.Rounds {
-		for _, suggestion := range round.Suggestions {
-			if suggestion.Map.ID == mapEntity.ID && suggestion.Map.ModInts == mapEntity.ModInts {
-				return entities.Suggestion{}, errors.New("this map is already suggested for this tournament")
-			}
-		}
-	}
-
 	if err != nil {
 		beatmapRes, err := apiclient.GetBeatmap(suggestionDto.Map.ID)
 		if err != nil {
@@ -239,6 +230,89 @@ func AddSuggestion(token string, suggestionDto models.SuggestionDto, roundId str
 	return suggestion, nil
 }
 
+func AddVote(token string, roundId uint, suggestionId uint, vote models.VoteDto) error {
+	user, err := userservice.GetUserFromToken(token)
+	if err != nil {
+		return err
+	}
+
+	// get the round from the database
+	round, err := GetRound(roundId)
+	if err != nil {
+		return err
+	}
+
+	// get the tournament from the database
+	tournament, err := GetTournament(round.TournamentId, DepthBasic|DepthSuggestions)
+	if err != nil {
+		return err
+	}
+
+	// check if the user is a mappooler or the owner of the tournament
+	canEdit := false
+	for _, pooler := range tournament.Poolers {
+		if pooler.ID == user.ID {
+			canEdit = true
+			break
+		}
+	}
+	for _, testplayer := range tournament.Testplayers {
+		if testplayer.ID == user.ID {
+			canEdit = true
+			break
+		}
+	}
+
+	if tournament.Owner.ID == user.ID {
+		canEdit = true
+	}
+
+	// if the user is not a mappooler or the owner, return an error
+	if !canEdit {
+		return errors.New("you are not allowed to vote for this tournament")
+	}
+
+	var roundToUse entities.Round
+	var suggestionToUse entities.Suggestion
+
+	// find the round and suggestion in the tournament
+	for _, round := range tournament.Rounds {
+		if round.ID == roundId {
+			roundToUse = round
+			for _, suggestion := range round.Suggestions {
+				if suggestion.ID == suggestionId {
+					suggestionToUse = suggestion
+					break
+				}
+			}
+			break
+		}
+	}
+
+	// if the round or suggestion could not be found, return an error
+	if roundToUse.ID == 0 || suggestionToUse.ID == 0 {
+		return errors.New("could not find the round or suggestion")
+	}
+
+	// construct our vote entity
+	var voteEntity entities.Vote
+
+	voteEntity.Comment = vote.Comment
+	voteEntity.Value = vote.Value
+	voteEntity.Author = user
+	voteEntity.SuggestionID = suggestionToUse.ID
+
+	// add the vote to the database
+	dbSession := database.GetDBSession()
+	err = dbSession.Create(&voteEntity).Error
+
+	if err != nil {
+		return err
+	}
+
+	return err
+}
+
 func convertDrain(drain float64, mods int64) float64 {
 	// easy halves it
 	if mods&modenum.Easy != 0 && drain > 0 {
@@ -281,7 +355,7 @@ func convertCS(cs float64, modInts int64) float64 {
 	return cs
 }
 
-func GetRound(roundId string) (entities.Round, error) {
+func GetRound[k comparable](roundId k) (entities.Round, error) {
 	// get the round from the database
 	dbSession := database.GetDBSession()
 	round := entities.Round{}
