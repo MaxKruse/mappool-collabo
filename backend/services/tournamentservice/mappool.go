@@ -294,6 +294,13 @@ func AddVote(token string, suggestionId uint, vote models.VoteDto) error {
 		}
 	}
 
+	// if we already voted, return an error
+	for _, v2 := range suggestionToUse.Votes {
+		if v2.Author.ID == user.ID {
+			return errors.New("you already voted for this suggestion")
+		}
+	}
+
 	// if the round or suggestion could not be found, return an error
 	if roundToUse.ID == 0 || suggestionToUse.ID == 0 {
 		return errors.New("could not find the round or suggestion")
