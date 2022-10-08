@@ -5,6 +5,7 @@ import (
 	"backend/models/entities"
 	"backend/services/database"
 	"backend/services/userservice"
+	"errors"
 
 	"gorm.io/gorm"
 )
@@ -74,7 +75,7 @@ func GetTournament[k comparable](id k, depth int) (entities.Tournament, error) {
 
 	err := preloads.First(&tournament, id).Error
 	if err != nil {
-		return entities.Tournament{}, err
+		return entities.Tournament{}, errors.New("could not find tournament: " + err.Error())
 	}
 
 	return tournament, err
@@ -112,7 +113,11 @@ func CreateTournament(tournament models.TournamentDto) (entities.Tournament, err
 		tournamentEntity.Testplayers = append(tournamentEntity.Testplayers, newTestplayer)
 	}
 
-	dbSession.Create(&tournamentEntity)
+	err = dbSession.Create(&tournamentEntity).Error
+	if err != nil {
+		return entities.Tournament{}, errors.New("could not create tournament: " + err.Error())
+	}
+
 	return tournamentEntity, nil
 }
 

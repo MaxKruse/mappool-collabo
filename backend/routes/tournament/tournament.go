@@ -139,7 +139,10 @@ func Delete(c *fiber.Ctx) error {
 	}
 
 	// delete tournament
-	tournamentservice.DeleteTournament(id)
+	err = tournamentservice.DeleteTournament(id)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
 
 	return c.SendStatus(fiber.StatusNoContent)
 }

@@ -21,7 +21,7 @@ func GetUserFromToken(token string) (entities.User, error) {
 	authToken := entities.Session{}
 	err := dbSession.Find(&authToken, "auth_token = ?", token).Error
 	if err != nil {
-		return entities.User{}, err
+		return entities.User{}, errors.New("invalid token")
 	}
 
 	if authToken.ID == 0 {
@@ -38,10 +38,10 @@ func GetUserFromId[k comparable](id k) (entities.User, error) {
 	err := dbSession.Preload("Token").Find(&res, "id = ?", id).Error
 
 	if err != nil {
-		return entities.User{}, err
+		return entities.User{}, errors.New("user not found")
 	}
 
-	return res, err
+	return res, nil
 }
 
 func GetUsers() []entities.User {

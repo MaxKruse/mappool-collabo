@@ -53,7 +53,7 @@ func AddRound(token string, roundDto models.RoundDto) (entities.Round, error) {
 	err = dbSession.Create(&round).Error
 
 	if err != nil {
-		return entities.Round{}, err
+		return entities.Round{}, errors.New("round with this name already exists for this tournament")
 	}
 
 	return round, nil
@@ -100,7 +100,7 @@ func RemoveRound(token string, roundId string) error {
 	err = dbSession.Delete(&round).Error
 
 	if err != nil {
-		return err
+		return errors.New("could not delete the round: " + err.Error())
 	}
 
 	return nil
@@ -215,7 +215,7 @@ func AddSuggestion(token string, suggestionDto models.SuggestionDto, roundId str
 	err = dbSession.Create(&suggestion).Error
 
 	if err != nil {
-		return entities.Suggestion{}, err
+		return entities.Suggestion{}, errors.New("could not create the suggestion: " + err.Error())
 	}
 
 	// add the suggestion to the round
@@ -224,7 +224,7 @@ func AddSuggestion(token string, suggestionDto models.SuggestionDto, roundId str
 	err = dbSession.Save(&round).Error
 
 	if err != nil {
-		return entities.Suggestion{}, err
+		return entities.Suggestion{}, errors.New("could not save the round: " + err.Error())
 	}
 
 	return suggestion, nil
@@ -319,10 +319,10 @@ func AddVote(token string, suggestionId uint, vote models.VoteDto) error {
 	err = dbSession.Create(&voteEntity).Error
 
 	if err != nil {
-		return err
+		return errors.New("could not create the vote: " + err.Error())
 	}
 
-	return err
+	return nil
 }
 
 func convertDrain(drain float64, mods int64) float64 {
@@ -375,7 +375,7 @@ func GetRound[k comparable](roundId k) (entities.Round, error) {
 	// get the round from the database
 	err := dbSession.Where("id = ?", roundId).First(&round).Error
 	if err != nil {
-		return entities.Round{}, err
+		return entities.Round{}, errors.New("could not find the round: " + err.Error())
 	}
 
 	return round, nil
@@ -389,7 +389,7 @@ func GetSuggestion[k comparable](suggestionId k) (entities.Suggestion, error) {
 	// get the round from the database
 	err := dbSession.Where("id = ?", suggestionId).First(&suggestion).Error
 	if err != nil {
-		return entities.Suggestion{}, err
+		return entities.Suggestion{}, errors.New("could not find the suggestion: " + err.Error())
 	}
 
 	return suggestion, nil
