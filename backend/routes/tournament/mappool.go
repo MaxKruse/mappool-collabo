@@ -69,7 +69,6 @@ func RemoveRound(c *fiber.Ctx) error {
 }
 
 func AddVote(c *fiber.Ctx) error {
-	roundId := c.Params("id")
 	suggestionId := c.Params("suggestionId")
 	var vote models.VoteDto
 	if err := c.BodyParser(&vote); err != nil {
@@ -79,18 +78,13 @@ func AddVote(c *fiber.Ctx) error {
 	token := c.Get("Authorization")
 
 	// convert roundId and suggestionId to uint
-	roundIdUint, err := strconv.ParseUint(roundId, 10, 32)
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Bad request"})
-	}
-
 	suggestionIdUint, err := strconv.ParseUint(suggestionId, 10, 32)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Bad request"})
 	}
 
 	// call the service to add the vote
-	err = tournamentservice.AddVote(token, uint(roundIdUint), uint(suggestionIdUint), vote)
+	err = tournamentservice.AddVote(token, uint(suggestionIdUint), vote)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}

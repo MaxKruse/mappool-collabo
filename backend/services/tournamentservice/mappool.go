@@ -230,14 +230,19 @@ func AddSuggestion(token string, suggestionDto models.SuggestionDto, roundId str
 	return suggestion, nil
 }
 
-func AddVote(token string, roundId uint, suggestionId uint, vote models.VoteDto) error {
+func AddVote(token string, suggestionId uint, vote models.VoteDto) error {
 	user, err := userservice.GetUserFromToken(token)
 	if err != nil {
 		return err
 	}
 
 	// get the round from the database
-	round, err := GetRound(roundId)
+	suggestion, err := GetSuggestion(suggestionId)
+	if err != nil {
+		return err
+	}
+
+	round, err := GetRound(suggestion.RoundId)
 	if err != nil {
 		return err
 	}
@@ -277,7 +282,7 @@ func AddVote(token string, roundId uint, suggestionId uint, vote models.VoteDto)
 
 	// find the round and suggestion in the tournament
 	for _, round := range tournament.Rounds {
-		if round.ID == roundId {
+		if round.ID == suggestion.RoundId {
 			roundToUse = round
 			for _, suggestion := range round.Suggestions {
 				if suggestion.ID == suggestionId {
@@ -367,4 +372,18 @@ func GetRound[k comparable](roundId k) (entities.Round, error) {
 	}
 
 	return round, nil
+}
+
+func GetSuggestion[k comparable](suggestionId k) (entities.Suggestion, error) {
+	// get the round from the database
+	dbSession := database.GetDBSession()
+	suggestion := entities.Suggestion{}
+
+	// get the round from the database
+	err := dbSession.Where("id = ?", suggestionId).First(&suggestion).Error
+	if err != nil {
+		return entities.Suggestion{}, err
+	}
+
+	return suggestion, nil
 }
