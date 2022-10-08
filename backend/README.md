@@ -4,14 +4,13 @@
 
 - [x] osu bancho login
 - [x] create tournament
-- [ ] create mappool
+- [x] create mappool
 - [x] permissions (groups)
 - [x] suggestions to mappool
 - [x] feedback for maps
 - [x] voting for maps
 - [x] add map to mappool
-- [ ] replay upload
-- [ ] replay picking
+- [x] replay upload
 
 ### Endpoints
 

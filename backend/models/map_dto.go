@@ -16,6 +16,7 @@ type MapDto struct {
 	Slot                 SlotDto                 `json:"slot,omitempty"`
 	Description          string                  `json:"description,omitempty"`
 	DifficultyAttributes *DifficultyAttributeDto `json:"difficultyAttributes,omitempty"`
+	Replays              []ReplayDto             `json:"replays,omitempty"`
 }
 
 type DifficultyAttributeDto struct {
@@ -43,6 +44,7 @@ func MapDtoFromEntity(mapEntity entities.Map) MapDto {
 			ModStrings: modenum.ModIntsToStringArray(mapEntity.Difficulty.ModInts),
 			ModInts:    mapEntity.Difficulty.ModInts,
 		},
+		Replays: ReplayDtoListFromEntityList(mapEntity.Replays),
 	}
 }
 

@@ -15,6 +15,8 @@ type config struct {
 	BanchoOauthRedirectURL  string
 	// Frontend
 	FrontendURL string
+	// Storage
+	StorageURI string
 }
 
 var Config config
@@ -36,4 +38,12 @@ func init() {
 	}
 
 	Config.FrontendURL = os.Getenv("FRONTEND_URL")
+	if Config.FrontendURL == "" {
+		panic("frontend url is not set")
+	}
+
+	Config.StorageURI = os.Getenv("STORAGE_URI")
+	if Config.StorageURI == "" {
+		panic("storage uri is not set")
+	}
 }

@@ -15,6 +15,7 @@ type Map struct {
 	PlaySlot    Slot
 	Description string
 	Difficulty  DifficultyAttributes
+	Replays     []Replay
 }
 
 type DifficultyAttributes struct {

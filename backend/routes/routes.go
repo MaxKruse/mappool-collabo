@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"backend/routes/beatmap"
 	"backend/routes/oauth"
 	"backend/routes/tournament"
 	"backend/routes/user"
@@ -53,5 +54,12 @@ func AddRoutes(app *fiber.App) {
 	{
 		votes.Post("/:suggestionId", tournament.AddVote)
 		votes.Delete("/:voteId", tournament.RemoveVote)
+	}
+
+	maps := app.Group("/maps")
+	{
+		maps.Get("/:id", beatmap.Get)
+		maps.Post("/replay", beatmap.AddReplay)
+		maps.Get("/replay/:id", beatmap.DownloadReplay)
 	}
 }
