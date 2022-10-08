@@ -8,7 +8,6 @@ import (
 	"backend/services/userservice"
 	"backend/util/modenum"
 	"errors"
-	"math"
 )
 
 func AddRound(token string, roundDto models.RoundDto) (entities.Round, error) {
@@ -325,72 +324,30 @@ func AddVote(token string, suggestionId uint, vote models.VoteDto) error {
 	return nil
 }
 
-func convertDrain(drain float64, mods int64) float64 {
-	// easy halves it
-	if mods&modenum.Easy != 0 && drain > 0 {
-		drain /= 2
-	}
-
-	// hardrock multiplies by 1.4, with 10.0 clamp
-	if mods&modenum.HardRock != 0 {
-		drain *= 1.4
-		if drain > 10.0 {
-			drain = 10.0
-		}
-	}
-
-	// Doubletime increases it by 50% (artifically, still want to display this)
-	if mods&modenum.DoubleTime != 0 {
-		drain *= 1.5
-	}
-
-	// Halftime decreases it by 25%
-	if mods&modenum.HalfTime != 0 {
-		drain *= 0.75
-	}
-
-	return drain
-}
-
-func convertCS(cs float64, modInts int64) float64 {
-	if modInts&modenum.HardRock > 0 {
-		// Multiply by 1.3, but clamp to 10.0
-		cs = math.Min(cs*1.3, 10.0)
-	}
-
-	// prevent divide by zero
-	if modInts&modenum.Easy > 0 && cs > 0 {
-		// Divide by 2
-		cs = cs / 2
-	}
-
-	return cs
-}
-
-func GetRound[k comparable](roundId k) (entities.Round, error) {
-	// get the round from the database
-	dbSession := database.GetDBSession()
-	round := entities.Round{}
-
-	// get the round from the database
-	err := dbSession.Where("id = ?", roundId).First(&round).Error
+func RemoveVote(token string, voteId string) error {
+	user, err := userservice.GetUserFromToken(token)
 	if err != nil {
-		return entities.Round{}, errors.New("could not find the round: " + err.Error())
+		return err
 	}
 
-	return round, nil
-}
-
-func GetSuggestion[k comparable](suggestionId k) (entities.Suggestion, error) {
-	// get the round from the database
-	dbSession := database.GetDBSession()
-	suggestion := entities.Suggestion{}
-
-	// get the round from the database
-	err := dbSession.Where("id = ?", suggestionId).First(&suggestion).Error
+	// get the vote from the database
+	vote, err := GetVote(voteId)
 	if err != nil {
-		return entities.Suggestion{}, errors.New("could not find the suggestion: " + err.Error())
+		return err
 	}
 
-	return suggestion, nil
+	// check if the user is trying to remove his own vote
+	if vote.Author.ID != user.ID {
+		return errors.New("you are not allowed to remove this vote")
+	}
+
+	// delete the vote from the database
+	dbSession := database.GetDBSession()
+	err = dbSession.Delete(&vote).Error
+
+	if err != nil {
+		return errors.New("could not delete the vote: " + err.Error())
+	}
+
+	return nil
 }

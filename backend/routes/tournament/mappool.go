@@ -91,3 +91,15 @@ func AddVote(c *fiber.Ctx) error {
 
 	return c.SendStatus(fiber.StatusOK)
 }
+
+func RemoveVote(c *fiber.Ctx) error {
+	voteId := c.Params("voteId")
+
+	token := c.Get("Authorization")
+	err := tournamentservice.RemoveVote(token, voteId)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return c.SendStatus(fiber.StatusNoContent)
+}
