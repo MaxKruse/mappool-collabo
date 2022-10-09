@@ -1,4 +1,4 @@
-export class User extends null{
+export class User{
     id: number;
     username: string;
     avatar_url: string;
