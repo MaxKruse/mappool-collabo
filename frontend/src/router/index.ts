@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router"
+import { createRouter, createWebHistory, RouteLocationNormalized, RouteRecordRaw } from "vue-router"
 
 const routes: Array<RouteRecordRaw> = [
     {
@@ -36,6 +36,13 @@ const routes: Array<RouteRecordRaw> = [
 const router = createRouter({
     history: createWebHistory(),
     routes
+})
+
+const DEFAULT_TITLE = "osu! Mappool Collabo"
+
+router.afterEach((to: RouteLocationNormalized, from: RouteLocationNormalized) => {
+    // set the page title to "osu! Mappool Collabo | `${route name}`"
+    document.title = `${DEFAULT_TITLE} | ${String(to.name)}`
 })
 
 export default router
