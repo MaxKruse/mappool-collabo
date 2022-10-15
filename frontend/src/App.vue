@@ -2,7 +2,7 @@
 
 import { onMounted } from 'vue';
 import { useDefaultStore } from './store'
-import { getSelf } from "./compositions";
+import { getSelf } from "./compositions/useUser";
 import { useRouter } from 'vue-router';
 
  
