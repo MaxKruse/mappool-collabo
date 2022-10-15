@@ -15,7 +15,7 @@ onMounted( async () => {
 
   // if the user is null, redirect to login page
   if (!user) {
-    // router.push('/login');
+    router.push('/login');
     return;
   }
   
