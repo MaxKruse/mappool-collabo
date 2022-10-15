@@ -40,7 +40,7 @@ const router = createRouter({
 
 const DEFAULT_TITLE = "osu! Mappool Collabo"
 
-router.afterEach((to: RouteLocationNormalized, from: RouteLocationNormalized) => {
+router.beforeResolve((to: RouteLocationNormalized) => {
     // set the page title to "osu! Mappool Collabo | `${route name}`"
     document.title = `${DEFAULT_TITLE} | ${String(to.name)}`
 })
