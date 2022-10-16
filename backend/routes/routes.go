@@ -59,7 +59,12 @@ func AddRoutes(app *fiber.App) {
 	maps := app.Group("/maps")
 	{
 		maps.Get("/:id", beatmap.Get)
-		maps.Post("/replay", beatmap.AddReplay)
-		maps.Get("/replay/:id", beatmap.DownloadReplay)
+		maps.Post(":/id/replay", beatmap.AddReplay)
+		maps.Get("/:id/replay", beatmap.GetReplayDownload)
+	}
+
+	replays := app.Group("/replays")
+	{
+		replays.Get("/:identifier", beatmap.DownloadReplay)
 	}
 }
