@@ -6,9 +6,19 @@ import (
 	"backend/util"
 	"log"
 	"os"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
+)
+
+type downloadable struct {
+	Filepath string
+	Filename string
+}
+
+var (
+	availableReplayDownloads = map[string]downloadable{}
 )
 
 func Get(c *fiber.Ctx) error {
@@ -69,7 +79,7 @@ func AddReplay(c *fiber.Ctx) error {
 	return c.SendStatus(fiber.StatusCreated)
 }
 
-func DownloadReplay(c *fiber.Ctx) error {
+func GetReplayDownload(c *fiber.Ctx) error {
 	replayId := c.Params("id")
 
 	token := c.Get("Authorization")
@@ -80,8 +90,38 @@ func DownloadReplay(c *fiber.Ctx) error {
 			"error": err.Error(),
 		})
 	}
+	// make a uuid for the key
+	downloadId := uuid.NewString()
 
 	downloadName := replay.Map.Name + " - " + replay.Map.SlotName() + " by " + replay.User.Username + ".osr"
 
-	return c.Download(replay.Filepath, downloadName)
+	availableReplayDownloads[downloadId] = downloadable{
+		Filepath: replay.Filepath,
+		Filename: downloadName,
+	}
+
+	// spin up a goroutine to delete the entry for this identifier after 5 minutes
+	go func() {
+		<-time.After(5 * time.Minute)
+		// Note that this will always try to delete the entry, even if it is already deleted
+		delete(availableReplayDownloads, downloadId)
+	}()
+
+	return c.SendString(downloadId)
+}
+
+func DownloadReplay(c *fiber.Ctx) error {
+	identifier := c.Params("identifier")
+
+	replayPath, ok := availableReplayDownloads[identifier]
+	if !ok {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Replay not found",
+		})
+	}
+
+	// delete the replay from the map
+	delete(availableReplayDownloads, identifier)
+
+	return c.Download(replayPath.Filepath, replayPath.Filename)
 }

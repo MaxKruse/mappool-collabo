@@ -25,19 +25,11 @@ export async function uploadReplay(id: number, file: File): Promise<any | null> 
 }
 
 // Download a file from the server by specifying the id
-export async function downloadReplay(id: number): Promise<void> {
+export async function getReplayDownload(id: number): Promise<string | null> {
     const response = await axiosClient.get<any>(`/maps/${id}/replay`, { responseType: "blob" }).catch((error) => {
         console.log(error);
-        return;
+        return null;
     })
 
-    const fileBlob = new Blob([response?.data], { type: "application/octet-stream" });
-    const url = window.URL.createObjectURL(fileBlob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", `replay-${id}.osr`);
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    return;
+    return response?.data ?? null;
 }
