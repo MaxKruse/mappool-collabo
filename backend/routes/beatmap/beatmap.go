@@ -13,12 +13,13 @@ import (
 )
 
 type downloadable struct {
+	UUID     string
 	Filepath string
 	Filename string
 }
 
 var (
-	availableReplayDownloads = map[string]downloadable{}
+	availableReplayDownloads = map[uint]downloadable{}
 )
 
 func Get(c *fiber.Ctx) error {
@@ -90,12 +91,18 @@ func GetReplayDownload(c *fiber.Ctx) error {
 			"error": err.Error(),
 		})
 	}
+
+	// if we already have the replay in our cache, send its uuid directly
+	if entry, ok := availableReplayDownloads[replay.ID]; ok {
+		return c.SendString(entry.UUID)
+	}
+
 	// make a uuid for the key
 	downloadId := uuid.NewString()
-
 	downloadName := replay.Map.Name + " - " + replay.Map.SlotName() + " by " + replay.User.Username + ".osr"
 
-	availableReplayDownloads[downloadId] = downloadable{
+	availableReplayDownloads[replay.ID] = downloadable{
+		UUID:     downloadId,
 		Filepath: replay.Filepath,
 		Filename: downloadName,
 	}
@@ -104,7 +111,7 @@ func GetReplayDownload(c *fiber.Ctx) error {
 	go func() {
 		<-time.After(5 * time.Minute)
 		// Note that this will always try to delete the entry, even if it is already deleted
-		delete(availableReplayDownloads, downloadId)
+		delete(availableReplayDownloads, replay.ID)
 	}()
 
 	return c.SendString(downloadId)
@@ -113,15 +120,15 @@ func GetReplayDownload(c *fiber.Ctx) error {
 func DownloadReplay(c *fiber.Ctx) error {
 	identifier := c.Params("identifier")
 
-	replayPath, ok := availableReplayDownloads[identifier]
-	if !ok {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"error": "Replay not found",
-		})
+	// find the downloadable entry for this identifier
+	for _, entry := range availableReplayDownloads {
+		if entry.UUID == identifier {
+			return c.Download(entry.Filepath, entry.Filename)
+		}
 	}
 
-	// delete the replay from the map
-	delete(availableReplayDownloads, identifier)
+	return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+		"error": "Replay not found",
+	})
 
-	return c.Download(replayPath.Filepath, replayPath.Filename)
 }
