@@ -127,7 +127,5 @@ func DownloadReplay(c *fiber.Ctx) error {
 		}
 	}
 
-	return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-		"error": "Replay not found",
-	})
+	return c.Status(fiber.StatusNotFound).SendString("replay not found")
 }

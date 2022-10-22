@@ -106,19 +106,20 @@ func RemoveVote(c *fiber.Ctx) error {
 	return c.SendStatus(fiber.StatusNoContent)
 }
 
+// This is a download endpoint, therefore we either send the file or a regular string
 func GetMappool(c *fiber.Ctx) error {
 	format := c.Params("format")
 	roundId := c.Params("roundId")
 
 	mappool, err := tournamentservice.GetMappool(roundId, format)
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
 	}
 
 	// make a temporary file
 	f, err := os.CreateTemp("", "mappool")
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
 	}
 	defer os.Remove(f.Name())
 
