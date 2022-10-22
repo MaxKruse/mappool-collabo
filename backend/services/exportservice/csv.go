@@ -71,7 +71,7 @@ func ExportCSV(writeTo io.Writer, maps []entities.Map) error {
 			return fmt.Errorf("mapper is empty")
 		}
 
-		writeable := []string{banner, mod, fmt.Sprintf("%d", id), title, fmt.Sprintf("%f", sr), fmt.Sprintf("%f", bpm), fmt.Sprintf("%f", length), fmt.Sprintf("%f", cs), fmt.Sprintf("%f", ar), fmt.Sprintf("%f", od), mapper}
+		writeable := []string{banner, mod, fmt.Sprintf("%d", id), title, fmt.Sprintf("%f", sr), fmt.Sprintf("%d", bpm), fmt.Sprintf("%f", length), fmt.Sprintf("%f", cs), fmt.Sprintf("%f", ar), fmt.Sprintf("%f", od), mapper}
 
 		if err := csvWriter.Write(writeable); err != nil {
 			return err
