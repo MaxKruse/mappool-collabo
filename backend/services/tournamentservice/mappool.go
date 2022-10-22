@@ -149,7 +149,7 @@ func AddSuggestion(token string, suggestionDto models.SuggestionDto, roundId str
 
 	// parse the suggestionDto.Map.Slot. Format should be "NM1", "HD2", "HR3", "DT4", "FM5" etc.
 
-	if len(suggestionDto.Map.Slot.Name) < 2 {
+	if len(suggestionDto.Map.Slot.Name) != 2 {
 		return entities.Suggestion{}, errors.New("invalid slot name")
 	}
 
@@ -175,7 +175,6 @@ func AddSuggestion(token string, suggestionDto models.SuggestionDto, roundId str
 		if err != nil {
 			return entities.Suggestion{}, err
 		}
-
 		// format the name of the map
 		// Artist - Song [Difficulty]
 		beatmapName := beatmapRes.Beatmapset.Artist + " - " + beatmapRes.Beatmapset.Title + " [" + beatmapRes.Version + "]"
@@ -188,6 +187,7 @@ func AddSuggestion(token string, suggestionDto models.SuggestionDto, roundId str
 				Name:  suggestionDto.Map.Slot.Name,
 				Index: suggestionDto.Map.Slot.Index,
 			},
+			Creator:     beatmapRes.Beatmapset.Creator,
 			Description: suggestionDto.Map.Description,
 			Difficulty: entities.DifficultyAttributes{
 				AR:      beatmapAttribsRes.Attributes.ApproachRate,
@@ -197,6 +197,7 @@ func AddSuggestion(token string, suggestionDto models.SuggestionDto, roundId str
 				Length:  float64(beatmapRes.TotalLength),
 				Stars:   beatmapAttribsRes.Attributes.StarRating,
 				ModInts: modInts,
+				BPM:     beatmapRes.Bpm,
 			},
 		}
 
@@ -350,4 +351,26 @@ func RemoveVote(token string, voteId string) error {
 	}
 
 	return nil
+}
+
+func GetMappool(roundId string, format string) ([]entities.Map, error) {
+	var mappool []entities.Map
+
+	// we only support json and csv
+	if format != "json" && format != "csv" {
+		return mappool, errors.New("invalid format")
+	}
+
+	// get the round from the database
+	round, err := GetRoundDeep(roundId)
+	if err != nil {
+		return mappool, err
+	}
+
+	// check if the round has a mappool
+	if len(round.Mappool) == 0 {
+		return mappool, errors.New("this round does not have a mappool yet")
+	}
+
+	return round.Mappool, nil
 }

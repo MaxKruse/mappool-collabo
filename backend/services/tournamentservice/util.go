@@ -64,6 +64,20 @@ func GetRound[k comparable](roundId k) (entities.Round, error) {
 	return round, nil
 }
 
+func GetRoundDeep[k comparable](roundId k) (entities.Round, error) {
+	// get the round from the database
+	dbSession := database.GetDBSession()
+	round := entities.Round{}
+
+	// get the round from the database
+	err := dbSession.Where("id = ?", roundId).Preload("Mappool").Preload("Suggestion.Votes").First(&round).Error
+	if err != nil {
+		return entities.Round{}, errors.New("could not find the round: " + err.Error())
+	}
+
+	return round, nil
+}
+
 func GetSuggestion[k comparable](suggestionId k) (entities.Suggestion, error) {
 	// get the round from the database
 	dbSession := database.GetDBSession()

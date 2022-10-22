@@ -16,6 +16,7 @@ type Map struct {
 	Description string
 	Difficulty  DifficultyAttributes
 	Replays     []Replay
+	Creator     string
 }
 
 type DifficultyAttributes struct {
@@ -28,6 +29,7 @@ type DifficultyAttributes struct {
 	Length  float64
 	ModInts int64
 	MapId   uint
+	BPM     int
 }
 
 func (m Map) SlotName() string {

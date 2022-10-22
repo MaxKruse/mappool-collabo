@@ -2,7 +2,9 @@ package tournament
 
 import (
 	"backend/models"
+	"backend/services/exportservice"
 	"backend/services/tournamentservice"
+	"os"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -102,4 +104,31 @@ func RemoveVote(c *fiber.Ctx) error {
 	}
 
 	return c.SendStatus(fiber.StatusNoContent)
+}
+
+func GetMappool(c *fiber.Ctx) error {
+	format := c.Params("format")
+	roundId := c.Params("roundId")
+
+	mappool, err := tournamentservice.GetMappool(roundId, format)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	// make a temporary file
+	f, err := os.CreateTemp("", "mappool")
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+	defer os.Remove(f.Name())
+
+	exportservice.ExportCSV(f, mappool)
+
+	// check for the format. If we return CSV, we need to return a CSV file
+	if format == "csv" {
+		return c.Download(f.Name(), "mappool.csv")
+	}
+
+	// default to json format
+	return c.JSON(mappool)
 }
