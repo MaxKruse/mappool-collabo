@@ -7,6 +7,8 @@ import (
 	"io"
 )
 
+const EXPORT_CSV = "csv"
+
 func ExportCSV(writeTo io.Writer, maps []entities.Map) error {
 	// write the csv header like follows:
 	// Banner, Mod, ID, Artist - Title [Difficulty], SR, BPM, Length, CS, AR, OD, Mapper

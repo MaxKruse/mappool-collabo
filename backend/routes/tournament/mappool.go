@@ -111,11 +111,6 @@ func GetMappool(c *fiber.Ctx) error {
 	format := c.Params("format")
 	roundId := c.Params("roundId")
 
-	mappool, err := tournamentservice.GetMappool(roundId, format)
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
-	}
-
 	// make a temporary file
 	f, err := os.CreateTemp("", "mappool")
 	if err != nil {
@@ -123,13 +118,30 @@ func GetMappool(c *fiber.Ctx) error {
 	}
 	defer os.Remove(f.Name())
 
-	exportservice.ExportCSV(f, mappool)
+	if format == exportservice.EXPORT_CSV {
+		mappool, err := tournamentservice.GetMappool(roundId, format)
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+		}
+		exportservice.ExportCSV(f, mappool)
+
+	} else if format == exportservice.EXPORT_LAZER {
+		round, err := tournamentservice.GetRoundDeep(roundId)
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+		}
+		exportservice.ExportLazer(f, round)
+	}
 
 	// check for the format. If we return CSV, we need to return a CSV file
-	if format == "csv" {
+	if format == exportservice.EXPORT_CSV {
 		return c.Download(f.Name(), "mappool.csv")
 	}
 
-	// default to json format
-	return c.JSON(mappool)
+	// if we return lazer, we need to return a json file
+	if format == exportservice.EXPORT_LAZER {
+		return c.Download(f.Name(), "mappool.json")
+	}
+
+	return c.SendStatus(fiber.StatusNotImplemented)
 }
