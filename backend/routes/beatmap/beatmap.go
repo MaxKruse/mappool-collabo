@@ -36,7 +36,7 @@ func Get(c *fiber.Ctx) error {
 
 	beatmapDto := models.MapDtoFromEntity(beatmap)
 
-	return c.JSON(beatmapDto)
+	return c.Status(fiber.StatusOK).JSON(beatmapDto)
 }
 
 func AddReplay(c *fiber.Ctx) error {
@@ -94,7 +94,7 @@ func GetReplayDownload(c *fiber.Ctx) error {
 
 	// if we already have the replay in our cache, send its uuid directly
 	if entry, ok := availableReplayDownloads[replay.ID]; ok {
-		return c.SendString(entry.UUID)
+		return c.Status(fiber.StatusCreated).SendString(entry.UUID)
 	}
 
 	// make a uuid for the key
@@ -114,7 +114,7 @@ func GetReplayDownload(c *fiber.Ctx) error {
 		delete(availableReplayDownloads, replay.ID)
 	}()
 
-	return c.SendString(downloadId)
+	return c.Status(fiber.StatusCreated).SendString(downloadId)
 }
 
 func DownloadReplay(c *fiber.Ctx) error {
@@ -127,5 +127,5 @@ func DownloadReplay(c *fiber.Ctx) error {
 		}
 	}
 
-	return c.Status(fiber.StatusNotFound).SendString("replay not found")
+	return c.Status(fiber.StatusNoContent).SendString("replay not found")
 }
