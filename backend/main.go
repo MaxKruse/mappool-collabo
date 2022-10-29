@@ -2,6 +2,7 @@ package main
 
 import (
 	"backend/routes"
+	"backend/services/sessioncleanerservice"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
@@ -27,6 +28,12 @@ func main() {
 
 	// Our groups
 	routes.AddRoutes(app)
+
+	// start the session cleaner service
+	sessCleaner := sessioncleanerservice.NewService(sessioncleanerservice.Config{
+		Margin: 60,
+	})
+	sessCleaner.Run()
 
 	// run the app
 	app.Listen(":5000")
