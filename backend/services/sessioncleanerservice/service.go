@@ -4,6 +4,7 @@ import (
 	"backend/models/entities"
 	"backend/services/database"
 	"log"
+	"sync"
 	"time"
 
 	"gorm.io/gorm"
@@ -17,6 +18,7 @@ type Config struct {
 type Service struct {
 	config    Config
 	dbSession *gorm.DB
+	wg        *sync.WaitGroup
 }
 
 const defaultMargin = 10
@@ -36,12 +38,16 @@ func NewService(configs ...Config) *Service {
 	return &Service{
 		dbSession: dbSession,
 		config:    config,
+		wg:        &sync.WaitGroup{},
 	}
 }
 
 func (s *Service) Run() {
-	// run an infinite loop that runs every (config.margin / 2) minutes
 	go s.internalRun()
+}
+
+func (s *Service) Wait() {
+	s.wg.Wait()
 }
 
 func (s *Service) internalRun() {
@@ -54,6 +60,8 @@ func (s *Service) internalRun() {
 }
 
 func (s *Service) Clean() {
+	s.wg.Add(1)
+	defer s.wg.Done()
 	// get all users
 	var users []entities.User
 	s.dbSession.Preload("Token").Preload("Sessions").Find(&users)

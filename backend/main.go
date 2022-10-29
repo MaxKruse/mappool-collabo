@@ -37,4 +37,5 @@ func main() {
 
 	// run the app
 	app.Listen(":5000")
+	sessCleaner.Wait()
 }
