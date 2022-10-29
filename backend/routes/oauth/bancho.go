@@ -83,7 +83,7 @@ func saveUser(user models.BanchoUserResponse, sessionToken string, oauthToken *o
 
 	// get existing user from db, by id
 	var existingUser entities.User
-	db.First(&existingUser, user.ID)
+	db.Preload("Token").Preload("Sessions").First(&existingUser, user.ID)
 
 	// make the session variable in any case
 	session := entities.Session{
@@ -94,9 +94,8 @@ func saveUser(user models.BanchoUserResponse, sessionToken string, oauthToken *o
 	// if user exists, add the session token to the existing user
 	if existingUser.ID != 0 {
 		existingUser.Sessions = append(existingUser.Sessions, session)
-		existingUser.Token = entities.Token{
-			Token: *oauthToken,
-		}
+		existingUser.Token.Token = *oauthToken
+
 		db.Save(&existingUser)
 	} else {
 		// if user does not exist, create a new user and add the session token
