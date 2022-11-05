@@ -163,8 +163,11 @@ func AddSuggestion(token string, suggestionDto models.SuggestionDto, roundId str
 	// if we already have a map with this ID and modInts, return, dont create a new entity
 	dbSession := database.GetDBSession()
 	var mapEntity entities.Map
+	var searchEntity entities.Map
+	searchEntity.BeatmapId = suggestionDto.Map.ID
+	searchEntity.ModInts = int(modInts)
 
-	err = dbSession.Preload("Difficulty").Preload("PlaySlot").Where("beatmap_id = ? AND mod_ints = ?", suggestionDto.Map.ID, modInts).First(&mapEntity).Error
+	err = dbSession.Preload("Difficulty").Preload("PlaySlot").First(&mapEntity, searchEntity).Error
 
 	if err != nil {
 		beatmapRes, err := apiclient.GetBeatmap(suggestionDto.Map.ID)
@@ -199,8 +202,13 @@ func AddSuggestion(token string, suggestionDto models.SuggestionDto, roundId str
 				ModInts: modInts,
 				BPM:     beatmapRes.Bpm,
 			},
+			ModInts: int(modInts),
 		}
 
+		err = dbSession.Create(&mapEntity).Error
+		if err != nil {
+			return entities.Suggestion{}, err
+		}
 	}
 
 	// create the suggestion
