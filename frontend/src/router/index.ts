@@ -38,11 +38,11 @@ const router = createRouter({
     routes
 })
 
-const DEFAULT_TITLE = "osu! Mappool Collabo"
+const DEFAULT_NAME = import.meta.env.VITE_PAGE_NAME;
 
 router.beforeResolve((to: RouteLocationNormalized) => {
     // set the page title to "osu! Mappool Collabo | `${route name}`"
-    document.title = `${DEFAULT_TITLE} | ${String(to.name)}`
+    document.title = `${DEFAULT_NAME} | ${String(to.name)}`
 })
 
 export default router
