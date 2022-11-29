@@ -1,21 +1,33 @@
 <script setup lang="ts">
 
-import { onMounted } from 'vue';
+import { onMounted, watch } from 'vue';
 import { useDefaultStore } from './store'
 import { getSelf } from "./compositions/useUser";
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
+import { User } from './models/User';
+
+import Navbar from './components/Navbar.vue';
 
  
 const store = useDefaultStore()
 const router = useRouter();
 
+const isUserLoggedIn = () => {
+    return store.user !== null && store.user !== undefined && store.user.avatar_url !== "";
+}
+
 onMounted( async () => {
   // get the user from backend
-  const user = await getSelf();
+  let user: User | null = null;
+  
+  try {
+    user = await getSelf();
+  } catch (e) {
+    router.push('/login');
+  }
 
   // if the user is null, redirect to login page
   if (!user) {
-    router.push('/login');
     return;
   }
   
@@ -26,7 +38,10 @@ onMounted( async () => {
 </script>
 
 <template>
-  <router-view></router-view>
+  <span>
+    <navbar v-if="isUserLoggedIn()"/>
+    <router-view />
+  </span>
 </template>
 
 <style scoped>
