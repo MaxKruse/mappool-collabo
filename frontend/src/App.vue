@@ -3,7 +3,7 @@
 import { onMounted, watch } from 'vue';
 import { useDefaultStore } from './store'
 import { getSelf } from "./compositions/useUser";
-import { useRoute, useRouter } from 'vue-router';
+import { useRouter } from 'vue-router';
 import { User } from './models/User';
 
 import Navbar from './components/Navbar.vue';
@@ -23,6 +23,7 @@ onMounted( async () => {
   try {
     user = await getSelf();
   } catch (e) {
+    console.log(e);
     router.push('/login');
   }
 
@@ -34,14 +35,15 @@ onMounted( async () => {
   // set the user to store
   store.setUser(user);
 })
-
 </script>
 
 <template>
-  <span>
-    <navbar v-if="isUserLoggedIn()"/>
-    <router-view />
-  </span>
+  <v-app>
+    <v-main>
+      <navbar v-if="isUserLoggedIn()"/>
+      <router-view/>
+    </v-main>
+  </v-app>
 </template>
 
 <style scoped>
