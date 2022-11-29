@@ -1,9 +1,9 @@
 <script setup lang="ts">
 
-import { onMounted, watch } from 'vue';
+import { onBeforeMount, onMounted, Suspense, watch } from 'vue';
 import { useDefaultStore } from './store'
 import { getSelf } from "./compositions/useUser";
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import { User } from './models/User';
 
 import Navbar from './components/Navbar.vue';
@@ -11,12 +11,13 @@ import Navbar from './components/Navbar.vue';
  
 const store = useDefaultStore()
 const router = useRouter();
+const route = useRoute();
 
 const isUserLoggedIn = () => {
     return store.user !== null && store.user !== undefined && store.user.avatar_url !== "";
 }
 
-onMounted( async () => {
+onMounted(async () => {
   // get the user from backend
   let user: User | null = null;
   
@@ -24,12 +25,7 @@ onMounted( async () => {
     user = await getSelf();
   } catch (e) {
     console.log(e);
-    router.push('/login');
-  }
-
-  // if the user is null, redirect to login page
-  if (!user) {
-    return;
+    await router.push('/login');
   }
   
   // set the user to store
