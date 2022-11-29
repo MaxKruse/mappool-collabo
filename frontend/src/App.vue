@@ -7,38 +7,20 @@ import { useRouter, useRoute } from 'vue-router';
 import { User } from './models/User';
 
 import Navbar from './components/Navbar.vue';
+import Login from './views/Login.vue';
 
  
 const store = useDefaultStore()
-const router = useRouter();
-const route = useRoute();
 
-const isUserLoggedIn = () => {
-    return store.user !== null && store.user !== undefined && store.user.avatar_url !== "";
-}
-
-onMounted(async () => {
-  // get the user from backend
-  let user: User | null = null;
-  
-  try {
-    user = await getSelf();
-  } catch (e) {
-    console.log(e);
-    await router.push('/login');
-  }
-  
-  // set the user to store
-  store.setUser(user);
-})
 </script>
 
 <template>
   <v-app>
+    <navbar class="bg-grey-lighten-1"/>
     <v-main>
-      <navbar v-if="isUserLoggedIn()"/>
       <router-view/>
     </v-main>
+  <v-footer class="bg-grey-lighten-1">Footer</v-footer>
   </v-app>
 </template>
 

@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory, RouteLocationNormalized, RouteRecordRaw } from "vue-router"
+import { getSelf } from "../compositions/useUser";
 
 const routes: Array<RouteRecordRaw> = [
     {
