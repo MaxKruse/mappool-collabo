@@ -46,4 +46,12 @@ router.beforeResolve((to: RouteLocationNormalized) => {
     document.title = `${DEFAULT_NAME} | ${String(to.name)}`
 })
 
+router.beforeEach(async (to: RouteLocationNormalized) => {
+  // if we get redirected to /login?token= grab the token and put it in localstorage
+    if (to.query.token) {
+        localStorage.setItem("auth_token", String(to.query.token))
+        window.location.href = "/"
+    }
+})
+
 export default router

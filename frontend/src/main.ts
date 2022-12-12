@@ -8,8 +8,10 @@ import { loadFonts } from './plugins/webfontloader'
 
 loadFonts()
 
+const pinia = createPinia()
+
 createApp(App)
   .use(router)
-    .use(createPinia())
+    .use(pinia)
     .use(vuetify)
     .mount('#app')
