@@ -3,5 +3,5 @@
 </script>
 
 <template>
-    Hi!
+    Suggestions View
 </template>

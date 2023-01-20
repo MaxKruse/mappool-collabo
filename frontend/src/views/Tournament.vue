@@ -3,5 +3,5 @@
 </script>
 
 <template>
-    Hi!
+    Tournament View
 </template>

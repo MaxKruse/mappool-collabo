@@ -29,7 +29,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <navbar class="bg-grey-lighten-1"/>
+  <navbar/>
   <main>
     <router-view v-if="isUserLoggedIn()"/>
     <Login v-else/>
@@ -37,4 +37,13 @@ onMounted(async () => {
 </template>
 
 <style scoped>
+/* main should take up a maximum of 60% width, be centered, yet not center the route-view */
+main {
+  max-width: 60%;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 64px;
+}
 </style>
